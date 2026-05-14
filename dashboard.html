@@ -6,6 +6,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Steven's OS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
@@ -38,12 +41,13 @@
 
     /* ─── RESET ─── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    button { background: none; border: none; cursor: pointer; font: inherit; }
+    button { background: none; border: none; cursor: pointer; font: inherit; color: inherit; }
     a { text-decoration: none; color: inherit; }
+    input, select { font: inherit; color: inherit; }
 
     /* ─── BASE ─── */
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100dvh;
@@ -97,6 +101,7 @@
       padding-top: 10px;
       z-index: 100;
     }
+    html.light .tab-bar { background: rgba(255,255,255,0.85); }
     .tab-item {
       flex: 1;
       display: flex;
@@ -125,7 +130,22 @@
 
     /* ─── TYPE ─── */
     .page-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
-    .section-title { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin-bottom: 14px; }
+    .section-title {
+      font-size: 16px; font-weight: 700; letter-spacing: -0.3px;
+      margin: 0 0 14px; padding-left: 10px;
+      position: relative; line-height: 1.2;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-title::before {
+      content: ''; position: absolute; left: 0; top: 2px; bottom: 2px;
+      width: 3px; background: var(--green); border-radius: 2px;
+    }
+    .section-title .edit {
+      margin-left: auto; padding: 4px 6px; color: var(--label);
+      font-size: 14px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    .section-title .edit:active { opacity: 0.5; }
+    .section-title.tight { margin-bottom: 10px; }
     .label {
       font-size: 10px;
       text-transform: uppercase;
@@ -148,6 +168,18 @@
       0%   { transform: scale(1); }
       45%  { transform: scale(1.18); }
       100% { transform: scale(1); }
+    }
+    @keyframes sheetIn {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
+    @keyframes sheetOut {
+      from { transform: translateY(0); }
+      to   { transform: translateY(100%); }
+    }
+    @keyframes backdropIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
     }
     .fade-in { opacity: 0; animation: fadeUp 380ms ease forwards; }
 
@@ -175,10 +207,45 @@
       background: var(--card); border: 1px solid var(--border);
       border-radius: var(--r-card); padding: 14px 12px;
       box-shadow: var(--shadow);
+      position: relative;
+      -webkit-tap-highlight-color: transparent;
     }
+    .stat-card.tap { cursor: pointer; transition: transform 100ms; }
+    .stat-card.tap:active { transform: scale(0.97); }
     .stat-card .label { display: block; margin-bottom: 8px; }
     .stat-value { font-size: 14px; font-weight: 700; letter-spacing: -0.3px; line-height: 1.25; }
     .stat-sub { font-size: 10px; margin-top: 3px; color: var(--label); }
+    .stat-card .tt-edit-icon {
+      position: absolute; top: 10px; right: 10px;
+      font-size: 12px; color: var(--label); opacity: 0.5;
+    }
+
+    /* Trip map card */
+    .trip-card { padding: 16px 16px 14px; }
+    .trip-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .trip-route { font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
+    .trip-sub { font-size: 11px; color: var(--label); margin-top: 2px; }
+    .trip-count { text-align: right; }
+    .trip-days { font-size: 26px; font-weight: 800; letter-spacing: -1px; line-height: 1; color: var(--green); }
+    .trip-days-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--label); margin-top: 3px; }
+    .trip-map { width: 100%; height: 150px; display: block; }
+    .trip-land { fill: rgba(255,255,255,0.07); stroke: rgba(255,255,255,0.12); stroke-width: 0.4; }
+    html.light .trip-land { fill: rgba(0,0,0,0.06); stroke: rgba(0,0,0,0.12); }
+    .trip-water { fill: transparent; }
+    .trip-path { fill: none; stroke: var(--red); stroke-width: 1.6; stroke-dasharray: 3 3; opacity: 0.85; }
+    .trip-pin { fill: var(--red); }
+    .trip-pin-glow { fill: var(--red); opacity: 0.25; }
+    .trip-plane { font-size: 14px; fill: var(--text); }
+
+    /* Today at a glance */
+    .glance-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .glance-block { display: flex; flex-direction: column; gap: 4px; }
+    .glance-icon-row { display: flex; align-items: center; gap: 8px; }
+    .glance-icon-row i { font-size: 22px; color: var(--blue); }
+    .glance-temp { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    .glance-cond { font-size: 11px; color: var(--label); }
+    .glance-quote { font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--text); font-style: italic; }
+    .glance-quote-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--label); margin-bottom: 4px; }
 
     /* Quick actions */
     .action-btn {
@@ -194,7 +261,7 @@
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
     .action-icon i { font-size: 19px; color: var(--blue); }
-    .action-label { flex: 1; font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: var(--text); }
+    .action-label { flex: 1; font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: var(--text); text-align: left; }
     .live-dot {
       width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0;
       animation: pulse 2.2s ease-in-out infinite;
@@ -212,7 +279,8 @@
     .prog-label { font-size: 11px; color: var(--label); white-space: nowrap; }
 
     /* ─── PORTFOLIO ─── */
-    .port-header { display: flex; justify-content: space-between; align-items: center; padding: 6px 0 20px; }
+    .port-header { display: flex; justify-content: space-between; align-items: center; padding: 6px 0 20px; gap: 10px; }
+    .port-header .right { display: flex; align-items: center; gap: 8px; }
     .live-badge {
       display: inline-flex; align-items: center; gap: 5px;
       font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
@@ -223,6 +291,8 @@
     html.light .live-badge.cached { background: rgba(0,0,0,0.06); }
     .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
     .live-badge.live .badge-dot { animation: pulse 2.2s ease-in-out infinite; }
+    .icon-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--card); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .icon-btn i { font-size: 14px; color: var(--label); }
 
     .donut-wrap { display: flex; justify-content: center; align-items: center; position: relative; height: 210px; margin-bottom: 6px; }
     .donut-center { position: absolute; text-align: center; pointer-events: none; }
@@ -239,6 +309,16 @@
     .h-gain { font-size: 11px; font-weight: 600; margin-top: 1px; }
     .pos { color: var(--green); }
     .neg { color: var(--red); }
+
+    .research-btn {
+      width: 100%; background: var(--blue); color: #fff;
+      padding: 14px; border-radius: 14px; font-size: 14px; font-weight: 700;
+      letter-spacing: -0.1px; display: flex; align-items: center; justify-content: center;
+      gap: 8px; -webkit-tap-highlight-color: transparent;
+      transition: transform 100ms, opacity 100ms;
+    }
+    .research-btn:active { transform: scale(0.985); opacity: 0.85; }
+    .research-btn i { font-size: 16px; }
 
     /* ─── HEALTH ─── */
     .health-header { padding: 6px 0 20px; }
@@ -305,6 +385,89 @@
     .skill-status.live { color: var(--green); }
     .skill-status.live .status-dot { animation: pulse 2.2s ease-in-out infinite; }
     .skill-status.soon { color: var(--label); }
+
+    /* ─── BOTTOM SHEET / MODAL ─── */
+    .backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+      z-index: 200; opacity: 0; pointer-events: none;
+      transition: opacity 200ms ease;
+    }
+    .backdrop.show { opacity: 1; pointer-events: all; animation: backdropIn 200ms ease; }
+    .sheet {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%) translateY(100%);
+      width: 100%; max-width: 430px;
+      background: var(--card); border-top-left-radius: 22px; border-top-right-radius: 22px;
+      z-index: 201; padding: 14px var(--pad) calc(env(safe-area-inset-bottom, 0px) + 24px);
+      max-height: 85dvh; overflow-y: auto;
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.6);
+      transition: transform 280ms cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .sheet.show { transform: translateX(-50%) translateY(0); }
+    .sheet-grab { width: 36px; height: 4px; border-radius: 2px; background: rgba(255,255,255,0.18); margin: 0 auto 14px; }
+    html.light .sheet-grab { background: rgba(0,0,0,0.16); }
+    .sheet-title { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 4px; }
+    .sheet-sub { font-size: 12px; color: var(--label); margin-bottom: 16px; }
+
+    .sheet-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0; border-top: 0.5px solid var(--divider);
+    }
+    .sheet-row:first-of-type { border-top: none; }
+    .sheet-row .label-text { flex: 1; font-size: 14px; font-weight: 500; }
+    .sheet-row .sub { font-size: 11px; color: var(--label); margin-top: 2px; }
+    .sheet-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sheet-icon i { font-size: 16px; }
+
+    /* Toggle switch */
+    .toggle {
+      position: relative; width: 44px; height: 26px; border-radius: 14px;
+      background: rgba(120,120,128,0.32); cursor: pointer; flex-shrink: 0;
+      transition: background 200ms; -webkit-tap-highlight-color: transparent;
+    }
+    .toggle::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 22px; height: 22px; border-radius: 50%; background: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      transition: transform 200ms cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .toggle.on { background: var(--green); }
+    .toggle.on::after { transform: translateX(18px); }
+
+    .sheet-input {
+      width: 100%; padding: 12px 14px; background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border); border-radius: 12px;
+      font-size: 14px; outline: none;
+      font-family: inherit;
+    }
+    html.light .sheet-input { background: rgba(0,0,0,0.04); }
+    .sheet-input:focus { border-color: var(--blue); }
+    .sheet-form { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .sheet-form .sheet-input { flex: 1; min-width: 120px; }
+    .sheet-btn {
+      background: var(--blue); color: #fff; padding: 12px 16px; border-radius: 12px;
+      font-size: 14px; font-weight: 700; -webkit-tap-highlight-color: transparent;
+      transition: transform 100ms, opacity 100ms;
+    }
+    .sheet-btn:active { transform: scale(0.97); opacity: 0.85; }
+    .sheet-btn.full { width: 100%; margin-top: 6px; }
+    .sheet-btn.ghost { background: transparent; color: var(--blue); border: 1px solid var(--blue); }
+    .del-btn {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,69,58,0.12); color: var(--red);
+      cursor: pointer; -webkit-tap-highlight-color: transparent; flex-shrink: 0;
+    }
+    .del-btn i { font-size: 14px; }
+
+    .sheet-close {
+      position: absolute; top: 14px; right: 14px;
+      width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(255,255,255,0.06); color: var(--label);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+    }
+    html.light .sheet-close { background: rgba(0,0,0,0.06); }
+    .sheet-close i { font-size: 14px; }
   </style>
 </head>
 <body>
@@ -334,30 +497,90 @@
         <span class="label">Workout</span>
         <div class="stat-value" id="todayWorkoutStat" style="font-size:12px;line-height:1.3"></div>
       </div>
-      <div class="stat-card fade-in" style="animation-delay:240ms">
+      <div class="stat-card tap fade-in" id="teeTimeCard" style="animation-delay:240ms">
+        <i class="ti ti-pencil tt-edit-icon"></i>
         <span class="label">Tee Time</span>
-        <div class="stat-value" style="font-size:12px;color:var(--label)">Not booked</div>
+        <div class="stat-value" id="teeTimeValue" style="font-size:12px;color:var(--label)">Tap to set</div>
+        <div class="stat-sub" id="teeTimeSub"></div>
       </div>
     </div>
 
+    <!-- Trip map -->
+    <div class="card trip-card fade-in" style="animation-delay:160ms">
+      <div class="trip-head">
+        <div>
+          <div class="trip-route">Malaga, Spain</div>
+          <div class="trip-sub">12 Oct 2026 · Golf trip</div>
+        </div>
+        <div class="trip-count">
+          <div class="trip-days" id="tripDays">—</div>
+          <div class="trip-days-lbl">days to go</div>
+        </div>
+      </div>
+      <svg class="trip-map" viewBox="0 0 380 150" preserveAspectRatio="xMidYMid meet" id="tripMap">
+        <!-- Simplified Europe / Mediterranean landmasses -->
+        <!-- UK/Ireland -->
+        <path class="trip-land" d="M 70 38 L 78 32 L 86 36 L 92 44 L 90 56 L 84 64 L 76 62 L 72 54 L 68 46 Z M 56 50 L 64 48 L 66 56 L 60 60 L 54 56 Z" />
+        <!-- Iberia (Spain/Portugal) -->
+        <path class="trip-land" d="M 60 96 L 75 90 L 95 92 L 115 94 L 130 100 L 132 110 L 124 120 L 108 124 L 88 122 L 70 116 L 58 108 Z" />
+        <!-- France -->
+        <path class="trip-land" d="M 100 70 L 120 64 L 140 68 L 150 78 L 148 90 L 134 92 L 118 88 L 104 82 Z" />
+        <!-- Central Europe / Italy -->
+        <path class="trip-land" d="M 150 70 L 180 66 L 210 70 L 220 80 L 215 92 L 200 94 L 180 90 L 160 86 Z M 175 96 L 184 94 L 192 110 L 188 124 L 180 122 L 176 112 Z" />
+        <!-- Balkans / Greece -->
+        <path class="trip-land" d="M 220 84 L 250 80 L 270 86 L 268 100 L 254 110 L 238 108 L 224 100 Z" />
+        <!-- North Africa coast -->
+        <path class="trip-land" d="M 50 130 L 100 132 L 160 134 L 220 134 L 280 134 L 340 134 L 360 138 L 360 150 L 0 150 L 0 134 L 30 132 Z" />
+        <!-- Scandinavia hint -->
+        <path class="trip-land" d="M 150 18 L 175 14 L 195 22 L 200 38 L 188 48 L 170 46 L 158 38 L 150 28 Z" />
+
+        <!-- Flight path: London (88, 50) → Malaga (95, 118) — curved -->
+        <path id="flightPath" class="trip-path" d="M 88 50 Q 60 90 95 118" />
+
+        <!-- Origin pin -->
+        <circle class="trip-pin-glow" cx="88" cy="50" r="5"/>
+        <circle class="trip-pin" cx="88" cy="50" r="2.5"/>
+        <!-- Destination pin -->
+        <circle class="trip-pin-glow" cx="95" cy="118" r="5"/>
+        <circle class="trip-pin" cx="95" cy="118" r="2.5"/>
+
+        <!-- Animated plane -->
+        <text class="trip-plane" text-anchor="middle" dominant-baseline="middle" font-family="Tabler Icons">
+          <animateMotion dur="6s" repeatCount="indefinite" rotate="auto">
+            <mpath href="#flightPath"/>
+          </animateMotion>
+          ✈
+        </text>
+
+        <!-- Labels -->
+        <text x="88" y="38" font-size="8" fill="rgba(255,255,255,0.55)" text-anchor="middle" font-family="Plus Jakarta Sans">London</text>
+        <text x="95" y="132" font-size="8" fill="rgba(255,255,255,0.55)" text-anchor="middle" font-family="Plus Jakarta Sans">Malaga</text>
+      </svg>
+    </div>
+
     <!-- Quick Actions -->
-    <div class="section-title fade-in" style="animation-delay:200ms">Quick Actions</div>
-    <div>
-      <button class="action-btn fade-in" style="animation-delay:250ms" onclick="openClaude('Morning briefing please')">
-        <div class="action-icon"><i class="ti ti-news"></i></div>
-        <span class="action-label">Morning Briefing</span>
-        <div class="live-dot"></div>
-      </button>
-      <button class="action-btn fade-in" style="animation-delay:350ms" onclick="openClaude('Daily check-in')">
-        <div class="action-icon"><i class="ti ti-heart-rate-monitor"></i></div>
-        <span class="action-label">Daily Check-In</span>
-        <div class="live-dot"></div>
-      </button>
-      <button class="action-btn fade-in" style="animation-delay:450ms" onclick="openClaude('Capture this — ')">
-        <div class="action-icon"><i class="ti ti-bulb"></i></div>
-        <span class="action-label">Capture Idea</span>
-        <div class="live-dot"></div>
-      </button>
+    <div class="section-title fade-in tight" style="animation-delay:200ms">
+      Quick Actions
+      <span class="edit" id="editActionsBtn"><i class="ti ti-pencil"></i></span>
+    </div>
+    <div id="quickActions"></div>
+
+    <!-- Today at a glance -->
+    <div class="section-title fade-in tight" style="animation-delay:280ms">Today at a Glance</div>
+    <div class="card fade-in" style="animation-delay:300ms">
+      <div class="glance-row">
+        <div class="glance-block">
+          <div class="glance-icon-row">
+            <i class="ti ti-cloud" id="weatherIcon"></i>
+            <div class="glance-temp" id="weatherTemp">—°</div>
+          </div>
+          <div class="glance-cond" id="weatherCond">Oxford</div>
+        </div>
+        <div class="glance-block">
+          <div class="glance-quote-lbl">Daily Note</div>
+          <div class="glance-quote" id="dailyQuote">—</div>
+        </div>
+      </div>
     </div>
 
     <!-- Claude Usage -->
@@ -394,8 +617,13 @@
 
     <div class="port-header">
       <div class="page-title">Portfolio</div>
-      <div class="live-badge cached" id="priceBadge">
-        <div class="badge-dot"></div><span>Checking</span>
+      <div class="right">
+        <div class="live-badge cached" id="priceBadge">
+          <div class="badge-dot"></div><span>Checking</span>
+        </div>
+        <div class="icon-btn" id="editPortfolioBtn" title="Edit holdings">
+          <i class="ti ti-pencil"></i>
+        </div>
       </div>
     </div>
 
@@ -403,25 +631,17 @@
       <div class="donut-wrap">
         <canvas id="donutCanvas"></canvas>
         <div class="donut-center">
-          <div class="donut-total" data-count="782.42" data-prefix="£" data-dec="2">£0</div>
-          <div class="donut-pct">+11.80%</div>
+          <div class="donut-total" id="donutTotal">£0</div>
+          <div class="donut-pct" id="donutPct">+0.00%</div>
         </div>
       </div>
       <div id="holdingsList"></div>
-      <div class="divider"></div>
-      <!-- EUR.AX -->
-      <div class="holding-row">
-        <div class="h-dot" style="background:#ffd60a"></div>
-        <div class="h-info">
-          <div class="h-name">EUR.AX</div>
-          <div class="h-sub">ASX &middot; £0.26/share &middot; Hold</div>
-        </div>
-        <div class="h-right">
-          <div class="h-val">£500</div>
-          <div class="h-gain" style="color:var(--label)">Invested</div>
-        </div>
-      </div>
     </div>
+
+    <button class="research-btn" onclick="openClaude('Research a stock — ')">
+      <i class="ti ti-trending-up"></i>
+      <span>Research a Stock →</span>
+    </button>
 
   </div><!-- /portfolio -->
 
@@ -445,7 +665,10 @@
 
     <!-- Habits -->
     <div class="card">
-      <div class="section-title">Today's Habits</div>
+      <div class="section-title">
+        Today's Habits
+        <span class="edit" id="editHabitsBtn"><i class="ti ti-pencil"></i></span>
+      </div>
       <div id="habitsList"></div>
     </div>
 
@@ -500,11 +723,64 @@
 
 </div><!-- /app -->
 
+<!-- ═══════════ MODALS ═══════════ -->
+<div class="backdrop" id="backdrop"></div>
+
+<!-- Tee time sheet -->
+<div class="sheet" id="sheetTeeTime">
+  <div class="sheet-grab"></div>
+  <div class="sheet-close" data-close><i class="ti ti-x"></i></div>
+  <div class="sheet-title">Tee Time</div>
+  <div class="sheet-sub">Set when you're next on the course.</div>
+  <input type="datetime-local" class="sheet-input" id="teeTimeInput" style="margin-bottom:10px">
+  <input type="text" class="sheet-input" id="teeCourseInput" placeholder="Course name (optional)" style="margin-bottom:14px">
+  <button class="sheet-btn full" id="teeSaveBtn">Save</button>
+  <button class="sheet-btn full ghost" id="teeClearBtn" style="margin-top:8px">Clear</button>
+</div>
+
+<!-- Quick Actions sheet -->
+<div class="sheet" id="sheetActions">
+  <div class="sheet-grab"></div>
+  <div class="sheet-close" data-close><i class="ti ti-x"></i></div>
+  <div class="sheet-title">Quick Actions</div>
+  <div class="sheet-sub">Pick which skills appear on your home screen.</div>
+  <div id="actionsToggleList"></div>
+</div>
+
+<!-- Portfolio sheet -->
+<div class="sheet" id="sheetPortfolio">
+  <div class="sheet-grab"></div>
+  <div class="sheet-close" data-close><i class="ti ti-x"></i></div>
+  <div class="sheet-title">Holdings</div>
+  <div class="sheet-sub">Add or remove positions.</div>
+  <div id="portfolioEditList"></div>
+  <div class="sheet-form" style="margin-top:14px">
+    <input type="text" class="sheet-input" id="newHoldingName" placeholder="Name (e.g. Tesla)">
+    <input type="text" class="sheet-input" id="newHoldingTicker" placeholder="Ticker" style="max-width:90px">
+    <input type="number" step="0.01" class="sheet-input" id="newHoldingValue" placeholder="£ Value" style="max-width:100px">
+    <input type="number" step="0.01" class="sheet-input" id="newHoldingGain" placeholder="Gain %" style="max-width:90px">
+  </div>
+  <button class="sheet-btn full" id="addHoldingBtn">Add Holding</button>
+</div>
+
+<!-- Habits sheet -->
+<div class="sheet" id="sheetHabits">
+  <div class="sheet-grab"></div>
+  <div class="sheet-close" data-close><i class="ti ti-x"></i></div>
+  <div class="sheet-title">Habits</div>
+  <div class="sheet-sub">Add, remove, or edit your daily habits.</div>
+  <div id="habitsEditList"></div>
+  <div class="sheet-form" style="margin-top:14px">
+    <input type="text" class="sheet-input" id="newHabitLabel" placeholder="New habit label">
+  </div>
+  <button class="sheet-btn full" id="addHabitBtn">Add Habit</button>
+</div>
+
 <script>
 /* ══════════════════════════════════════
-   DATA
+   DATA — defaults (overridden by storage)
 ══════════════════════════════════════ */
-const PORTFOLIO = [
+const DEFAULT_PORTFOLIO = [
   { name:'Vanguard S&P 500',  alloc:47.75, value:373.64, gain: 6.75,  color:'#0a84ff' },
   { name:'Vanguard All-World', alloc:33.86, value:264.91, gain: 8.13,  color:'#bf5af2' },
   { name:'AMD',               alloc:11.19, value:87.57,  gain:78.97,  color:'#64d2ff', ticker:'AMD' },
@@ -512,160 +788,115 @@ const PORTFOLIO = [
   { name:'Palantir',          alloc: 2.08, value:16.28,  gain:-22.37, color:'#ff453a', ticker:'PLTR' },
 ];
 
-const WORKOUT_NAMES = {
-  0:'Rest Day', 1:'Upper Body Strength', 2:'Lower Body + Knees',
-  3:'Mobility Day', 4:'Upper Hypertrophy', 5:'Golf Power', 6:'Core + Speed',
-};
-const WORKOUT_EXERCISES = {
-  1:[
-    {n:'Pull-ups',                    r:'4 × 6–8'},
-    {n:'DB Row (chest supported)',    r:'4 × 8'},
-    {n:'Incline DB Press',            r:'4 × 8'},
-    {n:'Face Pulls',                  r:'4 × 15'},
-    {n:'Rear Delt Fly',               r:'4 × 12'},
-    {n:'DB Shrugs',                   r:'3 × 12'},
-    {n:'Dead Hangs',                  r:'3 × 30s'},
-  ],
-  2:[
-    {n:'ATG Split Squats',            r:'4 × 8 ea'},
-    {n:'Romanian Deadlift',           r:'4 × 8'},
-    {n:'Tibialis Raises',             r:'3 × 20'},
-    {n:'Nordic Hamstring Curl',       r:'3 × 6'},
-    {n:'Standing Calf Raises',        r:'4 × 12'},
-    {n:'Reverse Walking',             r:'10 min'},
-  ],
-  3:[
-    {n:'20–30 min walk',              r:'Daily'},
-    {n:"Child's pose",                r:'1 min'},
-    {n:'Thread the needle',           r:'1 min ea'},
-    {n:'Cat cow',                     r:'1 min'},
-    {n:'Pigeon stretch',              r:'1 min ea'},
-    {n:'Hip flexor stretch',          r:'1 min ea'},
-  ],
-  4:[
-    {n:'Barbell Bench Press',         r:'4 × 6–8'},
-    {n:'Lat Pulldown',                r:'4 × 10'},
-    {n:'Seated Cable Row',            r:'4 × 10'},
-    {n:'DB Lateral Raises',           r:'4 × 12'},
-    {n:'Rear Delt Cable Fly',         r:'4 × 12'},
-    {n:'Hammer Curls',                r:'3 × 10'},
-    {n:'Tricep Rope Pushdown',        r:'3 × 12'},
-  ],
-  5:[
-    {n:'Trap Bar Deadlift',           r:'4 × 5'},
-    {n:'Bulgarian Split Squats',      r:'3 × 8'},
-    {n:'Hip Thrusts',                 r:'4 × 8'},
-    {n:'Kettlebell Swings',           r:'3 × 15'},
-    {n:'Box Jumps',                   r:'3 × 6'},
-    {n:'Hanging Leg Raises',          r:'3 × 12'},
-  ],
-  6:[
-    {n:'Cable Woodchoppers',          r:'3 × 12'},
-    {n:'Pallof Press',                r:'3 × 12'},
-    {n:'Back Extensions',             r:'3 × 12'},
-    {n:'Neck Curls',                  r:'3 × 15'},
-    {n:'Neck Extensions',             r:'3 × 15'},
-    {n:'Farmer Carries',              r:'4 × 30m'},
-    {n:'Driver swings (100% speed)',  r:'10 swings'},
-  ],
-  0:[{n:'Rest — mobility and walking only', r:''}],
+// EUR.AX special — 1923 shares (£500 ÷ £0.26) tracked in AUD on ASX
+const EUR_AX = {
+  name: 'EUR.AX', shares: 1923, invested: 500, color: '#ffd60a', ticker: 'EUR.AX',
 };
 
-const MEALS = {
-  breakfast:[
-    '4 eggs, sourdough toast, butter, blueberries',
-    'Greek yogurt, oats, honey, banana',
-    '3 eggs, roasted potatoes, spinach, tomatoes',
-    'Skyr yogurt, granola, strawberries',
-    'Egg omelette, mushrooms, onions, sourdough',
-  ],
-  snack:[
-    'Greek yogurt, honey, cashews',
-    'Kefir and banana',
-    'Cottage cheese and apple',
-    '2 boiled eggs and fruit',
-    'Protein smoothie — milk, yogurt, banana, honey',
-  ],
-  lunch:[
-    'Grass-fed steak, potatoes, broccoli',
-    'Chicken thighs, rice, vegetables',
-    'Salmon, sweet potato, asparagus',
-    'Turkey mince bowl — rice, peppers, onions',
-    'Lamb mince, roasted vegetables, potatoes',
-  ],
-  afternoon:[
-    'Cottage cheese and berries',
-    'Greek yogurt, cashews, honey',
-    'Kefir smoothie — banana and milk',
-    'Sardines on sourdough toast',
-    '2 eggs and fruit',
-  ],
-  dinner:[
-    'Salmon, rice, asparagus',
-    'Steak, sweet potato, broccoli',
-    'Chicken thighs, roasted potatoes, green beans',
-    'Cod, rice, vegetables',
-    'Beef mince rice bowl — peppers and onions',
-  ],
-  preBed:[
-    'Greek yogurt and honey',
-    'Cottage cheese and berries',
-    'Kefir',
-  ],
-};
-
-const HABITS = [
+const DEFAULT_HABITS = [
   {key:'supps',  label:'Supplements — creatine, mag, fish oil, D3, collagen'},
   {key:'walk',   label:'20–30 min walk'},
   {key:'prebed', label:'Pre-bed snack done'},
 ];
 
 const SKILLS_DATA = [
-  {name:'Morning Briefing',   icon:'ti-news',               color:'#0a84ff', bg:'rgba(10,132,255,0.12)',  live:true,  trigger:'Morning briefing please'},
-  {name:'Daily Check-In',     icon:'ti-heart-rate-monitor', color:'#30d158', bg:'rgba(48,209,88,0.12)',   live:true,  trigger:'Daily check-in'},
-  {name:'Capture Idea',       icon:'ti-bulb',               color:'#ffd60a', bg:'rgba(255,214,10,0.12)',  live:true,  trigger:'Capture this — '},
-  {name:'Research Stock',     icon:'ti-trending-up',        color:'#64d2ff', bg:'rgba(100,210,255,0.12)', live:false},
-  {name:'Find Tee Time',      icon:'ti-golf',               color:'#30d158', bg:'rgba(48,209,88,0.12)',   live:false},
-  {name:'Plan Meals',         icon:'ti-chef-hat',           color:'#ff9f0a', bg:'rgba(255,159,10,0.12)',  live:false},
-  {name:"Today's Workout",    icon:'ti-barbell',            color:'#bf5af2', bg:'rgba(191,90,242,0.12)',  live:false},
-  {name:'AI Intel Brief',     icon:'ti-robot',              color:'#64d2ff', bg:'rgba(100,210,255,0.12)', live:false},
-  {name:'Plan a Trip',        icon:'ti-plane',              color:'#ff9f0a', bg:'rgba(255,159,10,0.12)',  live:false},
-  {name:'Weekend Activities', icon:'ti-compass',            color:'#bf5af2', bg:'rgba(191,90,242,0.12)',  live:false},
-  {name:'Weekly Spending',    icon:'ti-wallet',             color:'#30d158', bg:'rgba(48,209,88,0.12)',   live:false},
+  {key:'morning',  name:'Morning Briefing',   icon:'ti-news',               color:'#0a84ff', bg:'rgba(10,132,255,0.12)',  live:true,  trigger:'Morning briefing please'},
+  {key:'daily',    name:'Daily Check-In',     icon:'ti-heart-rate-monitor', color:'#30d158', bg:'rgba(48,209,88,0.12)',   live:true,  trigger:'Daily check-in'},
+  {key:'capture',  name:'Capture Idea',       icon:'ti-bulb',               color:'#ffd60a', bg:'rgba(255,214,10,0.12)',  live:true,  trigger:'Capture this — '},
+  {key:'research', name:'Research Stock',     icon:'ti-trending-up',        color:'#64d2ff', bg:'rgba(100,210,255,0.12)', live:false, trigger:'Research a stock — '},
+  {key:'tee',      name:'Find Tee Time',      icon:'ti-golf',               color:'#30d158', bg:'rgba(48,209,88,0.12)',   live:false, trigger:'Find me a tee time'},
+  {key:'meals',    name:'Plan Meals',         icon:'ti-chef-hat',           color:'#ff9f0a', bg:'rgba(255,159,10,0.12)',  live:false, trigger:'Plan my meals for the week'},
+  {key:'workout',  name:"Today's Workout",    icon:'ti-barbell',            color:'#bf5af2', bg:'rgba(191,90,242,0.12)',  live:false, trigger:"What's my workout today?"},
+  {key:'intel',    name:'AI Intel Brief',     icon:'ti-robot',              color:'#64d2ff', bg:'rgba(100,210,255,0.12)', live:false, trigger:'Run my AI intel brief'},
+  {key:'trip',     name:'Plan a Trip',        icon:'ti-plane',              color:'#ff9f0a', bg:'rgba(255,159,10,0.12)',  live:false, trigger:'Plan a trip — '},
+  {key:'weekend',  name:'Weekend Activities', icon:'ti-compass',            color:'#bf5af2', bg:'rgba(191,90,242,0.12)',  live:false, trigger:'Suggest weekend activities'},
+  {key:'spending', name:'Weekly Spending',    icon:'ti-wallet',             color:'#30d158', bg:'rgba(48,209,88,0.12)',   live:false, trigger:'Show my weekly spending summary'},
+];
+
+const WORKOUT_NAMES = {
+  0:'Rest Day', 1:'Upper Body Strength', 2:'Lower Body + Knees',
+  3:'Mobility Day', 4:'Upper Hypertrophy', 5:'Golf Power', 6:'Core + Speed',
+};
+const WORKOUT_EXERCISES = {
+  1:[{n:'Pull-ups',r:'4 × 6–8'},{n:'DB Row (chest supported)',r:'4 × 8'},{n:'Incline DB Press',r:'4 × 8'},{n:'Face Pulls',r:'4 × 15'},{n:'Rear Delt Fly',r:'4 × 12'},{n:'DB Shrugs',r:'3 × 12'},{n:'Dead Hangs',r:'3 × 30s'}],
+  2:[{n:'ATG Split Squats',r:'4 × 8 ea'},{n:'Romanian Deadlift',r:'4 × 8'},{n:'Tibialis Raises',r:'3 × 20'},{n:'Nordic Hamstring Curl',r:'3 × 6'},{n:'Standing Calf Raises',r:'4 × 12'},{n:'Reverse Walking',r:'10 min'}],
+  3:[{n:'20–30 min walk',r:'Daily'},{n:"Child's pose",r:'1 min'},{n:'Thread the needle',r:'1 min ea'},{n:'Cat cow',r:'1 min'},{n:'Pigeon stretch',r:'1 min ea'},{n:'Hip flexor stretch',r:'1 min ea'}],
+  4:[{n:'Barbell Bench Press',r:'4 × 6–8'},{n:'Lat Pulldown',r:'4 × 10'},{n:'Seated Cable Row',r:'4 × 10'},{n:'DB Lateral Raises',r:'4 × 12'},{n:'Rear Delt Cable Fly',r:'4 × 12'},{n:'Hammer Curls',r:'3 × 10'},{n:'Tricep Rope Pushdown',r:'3 × 12'}],
+  5:[{n:'Trap Bar Deadlift',r:'4 × 5'},{n:'Bulgarian Split Squats',r:'3 × 8'},{n:'Hip Thrusts',r:'4 × 8'},{n:'Kettlebell Swings',r:'3 × 15'},{n:'Box Jumps',r:'3 × 6'},{n:'Hanging Leg Raises',r:'3 × 12'}],
+  6:[{n:'Cable Woodchoppers',r:'3 × 12'},{n:'Pallof Press',r:'3 × 12'},{n:'Back Extensions',r:'3 × 12'},{n:'Neck Curls',r:'3 × 15'},{n:'Neck Extensions',r:'3 × 15'},{n:'Farmer Carries',r:'4 × 30m'},{n:'Driver swings (100% speed)',r:'10 swings'}],
+  0:[{n:'Rest — mobility and walking only',r:''}],
+};
+
+const MEALS = {
+  breakfast:['4 eggs, sourdough toast, butter, blueberries','Greek yogurt, oats, honey, banana','3 eggs, roasted potatoes, spinach, tomatoes','Skyr yogurt, granola, strawberries','Egg omelette, mushrooms, onions, sourdough'],
+  snack:['Greek yogurt, honey, cashews','Kefir and banana','Cottage cheese and apple','2 boiled eggs and fruit','Protein smoothie — milk, yogurt, banana, honey'],
+  lunch:['Grass-fed steak, potatoes, broccoli','Chicken thighs, rice, vegetables','Salmon, sweet potato, asparagus','Turkey mince bowl — rice, peppers, onions','Lamb mince, roasted vegetables, potatoes'],
+  afternoon:['Cottage cheese and berries','Greek yogurt, cashews, honey','Kefir smoothie — banana and milk','Sardines on sourdough toast','2 eggs and fruit'],
+  dinner:['Salmon, rice, asparagus','Steak, sweet potato, broccoli','Chicken thighs, roasted potatoes, green beans','Cod, rice, vegetables','Beef mince rice bowl — peppers and onions'],
+  preBed:['Greek yogurt and honey','Cottage cheese and berries','Kefir'],
+};
+
+const QUOTES = [
+  'Discipline equals freedom — Jocko.',
+  'Slow is smooth, smooth is fast.',
+  'You can do hard things.',
+  'One small win, then another.',
+  'Show up. The rest follows.',
+  'Be patient with results, impatient with effort.',
+  'Today is a deposit on the future you.',
 ];
 
 /* ══════════════════════════════════════
    STATE
 ══════════════════════════════════════ */
-const today      = new Date();
-const DOW        = today.getDay(); // 0=Sun
-let   mealSwap   = 0;
-let   habitState = JSON.parse(localStorage.getItem('habits_v2') || '{}');
-let   handicap   = parseFloat(localStorage.getItem('handicap') || '15.1');
-let   usageChart = null;
+const today = new Date();
+const DOW   = today.getDay(); // 0=Sun
+let mealSwap = 0;
+
+// Load persisted state
+let portfolio = JSON.parse(localStorage.getItem('portfolio_v2') || 'null') || JSON.parse(JSON.stringify(DEFAULT_PORTFOLIO));
+let habits    = JSON.parse(localStorage.getItem('habitsList_v2') || 'null') || JSON.parse(JSON.stringify(DEFAULT_HABITS));
+let habitState = JSON.parse(localStorage.getItem('habits_v2') || '{}');
+let handicap   = parseFloat(localStorage.getItem('handicap') || '15.1');
+let teeTime    = JSON.parse(localStorage.getItem('teeTime') || 'null'); // {iso, course}
+let activeActions = JSON.parse(localStorage.getItem('activeActions') || 'null') || ['morning','daily','capture'];
+let usageChart = null;
+
+// Live FX rates
+let fxGBPUSD = null; // GBP per USD
+let fxAUDGBP = null; // GBP per AUD
+let livePrices = {}; // { ticker: USD or AUD price }
+let eurAxValueGBP = EUR_AX.invested; // start with invested
 
 /* ══════════════════════════════════════
    HELPERS
 ══════════════════════════════════════ */
 function mealIdx(extra = 0) {
-  // Mon(1)→0 … Fri(5)→4, then mod 5 for the 5 options
   const base = ((DOW + 6) % 7) % 5;
   return (base + mealSwap + extra) % 5;
 }
-
 function greeting() {
   const h = today.getHours();
   return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
 }
-
 function fmtDate(d) {
   return d.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
 }
-
 function openClaude(trigger) {
   if (navigator.clipboard) navigator.clipboard.writeText(trigger).catch(()=>{});
-  window.open('https://claude.ai', '_blank');
+  // Try deep link to Claude app, fall back to web
+  const start = Date.now();
+  const fallback = setTimeout(() => {
+    if (Date.now() - start < 2500) window.open('https://claude.ai', '_blank');
+  }, 800);
+  try {
+    window.location.href = 'claudeai://chat';
+  } catch (_) {
+    clearTimeout(fallback);
+    window.open('https://claude.ai', '_blank');
+  }
 }
+function save(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
 
 /* ══════════════════════════════════════
    COUNT-UP
@@ -693,13 +924,103 @@ function initHome() {
   document.getElementById('greeting').textContent = greeting() + ', Steven';
   document.getElementById('homeDate').textContent = fmtDate(today);
   document.getElementById('todayWorkoutStat').textContent = WORKOUT_NAMES[DOW] || 'Rest Day';
+  renderTeeTime();
+  renderTripCountdown();
+  renderQuickActions();
+  renderQuote();
 }
 
+function renderTeeTime() {
+  const v = document.getElementById('teeTimeValue');
+  const s = document.getElementById('teeTimeSub');
+  if (!teeTime || !teeTime.iso) {
+    v.textContent = 'Tap to set';
+    v.style.color = 'var(--label)';
+    s.textContent = '';
+    return;
+  }
+  const d = new Date(teeTime.iso);
+  v.textContent = d.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short'});
+  v.style.color = 'var(--text)';
+  const time = d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+  s.textContent = teeTime.course ? `${time} · ${teeTime.course}` : time;
+  s.style.color = 'var(--green)';
+}
+
+function renderTripCountdown() {
+  const tripDate = new Date('2026-10-12T00:00:00');
+  const now = new Date();
+  const days = Math.ceil((tripDate - now) / 86400000);
+  document.getElementById('tripDays').textContent = days > 0 ? days : '0';
+}
+
+function renderQuote() {
+  const idx = Math.floor((today.getTime() / 86400000)) % QUOTES.length;
+  document.getElementById('dailyQuote').textContent = QUOTES[Math.abs(idx)];
+}
+
+/* ══════════════════════════════════════
+   QUICK ACTIONS
+══════════════════════════════════════ */
+function renderQuickActions() {
+  const list = SKILLS_DATA.filter(s => activeActions.includes(s.key));
+  const c = document.getElementById('quickActions');
+  c.innerHTML = list.map((s, i) => `
+    <button class="action-btn fade-in" style="animation-delay:${250 + i*80}ms" data-trigger="${s.trigger}">
+      <div class="action-icon" style="background:${s.bg}"><i class="ti ${s.icon}" style="color:${s.color}"></i></div>
+      <span class="action-label">${s.name}</span>
+      ${s.live ? '<div class="live-dot"></div>' : ''}
+    </button>
+  `).join('');
+  c.querySelectorAll('.action-btn').forEach(btn => {
+    btn.addEventListener('click', () => openClaude(btn.dataset.trigger));
+  });
+}
+
+/* ══════════════════════════════════════
+   WEATHER (Oxford via open-meteo, 1hr cache)
+══════════════════════════════════════ */
+const WEATHER_ICONS = {
+  0:['ti-sun','Clear'], 1:['ti-sun','Mostly clear'], 2:['ti-cloud-sun','Partly cloudy'], 3:['ti-cloud','Overcast'],
+  45:['ti-mist','Fog'], 48:['ti-mist','Fog'],
+  51:['ti-cloud-rain','Drizzle'], 53:['ti-cloud-rain','Drizzle'], 55:['ti-cloud-rain','Drizzle'],
+  61:['ti-cloud-rain','Rain'], 63:['ti-cloud-rain','Rain'], 65:['ti-cloud-rain','Heavy rain'],
+  71:['ti-snowflake','Snow'], 73:['ti-snowflake','Snow'], 75:['ti-snowflake','Heavy snow'],
+  80:['ti-cloud-rain','Showers'], 81:['ti-cloud-rain','Showers'], 82:['ti-cloud-rain','Showers'],
+  95:['ti-cloud-storm','Thunder'], 96:['ti-cloud-storm','Thunder'], 99:['ti-cloud-storm','Thunder'],
+};
+
+async function fetchWeather() {
+  const cached = JSON.parse(localStorage.getItem('weather_v1') || 'null');
+  const fresh  = cached && (Date.now() - cached.at) < 3600000;
+  if (fresh) return paintWeather(cached.data);
+
+  try {
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=51.752&longitude=-1.2577&current=temperature_2m,weather_code&timezone=Europe/London';
+    const res = await fetch(url, { signal: AbortSignal.timeout(7000) });
+    const json = await res.json();
+    const data = {
+      temp: Math.round(json.current.temperature_2m),
+      code: json.current.weather_code,
+    };
+    localStorage.setItem('weather_v1', JSON.stringify({ at: Date.now(), data }));
+    paintWeather(data);
+  } catch (_) {
+    if (cached) paintWeather(cached.data);
+  }
+}
+function paintWeather(d) {
+  const [icon, cond] = WEATHER_ICONS[d.code] || ['ti-cloud','Oxford'];
+  document.getElementById('weatherIcon').className = 'ti ' + icon;
+  document.getElementById('weatherTemp').textContent = d.temp + '°';
+  document.getElementById('weatherCond').textContent = cond + ' · Oxford';
+}
+
+/* ══════════════════════════════════════
+   USAGE CHART
+══════════════════════════════════════ */
 function initUsageChart() {
-  // Mon=20k, Tue=45k, Wed=12.7k (today=Wed), rest=0
-  const dowIdx = ((DOW + 6) % 7); // Mon=0 … Sun=6
-  const raw    = [20000, 45000, 12700, 0, 0, 0, 0];
-  // Shift array so today's position has 12.7k
+  const dowIdx = ((DOW + 6) % 7);
   const data   = Array(7).fill(0);
   data[dowIdx] = 12700;
   if (dowIdx > 0) data[dowIdx - 1] = 45000;
@@ -734,12 +1055,8 @@ function initUsageChart() {
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: '#1a1a1f',
-          borderColor: 'rgba(255,255,255,0.07)',
-          borderWidth: 1,
-          titleColor: 'rgba(255,255,255,0.4)',
-          bodyColor: '#fff',
-          padding: 10,
+          backgroundColor: '#1a1a1f', borderColor: 'rgba(255,255,255,0.07)', borderWidth: 1,
+          titleColor: 'rgba(255,255,255,0.4)', bodyColor: '#fff', padding: 10,
           callbacks: { label: c => ' ' + (c.raw / 1000).toFixed(1) + 'k tokens' },
         },
       },
@@ -768,16 +1085,13 @@ function drawDonut() {
   const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
 
-  const cx  = size / 2;
-  const cy  = size / 2;
-  const r   = 82;
-  const lw  = 14;
-  const gap = 0.055; // radians between segments
-  const tot = PORTFOLIO.reduce((s, p) => s + p.alloc, 0);
+  const cx = size / 2, cy = size / 2, r = 82, lw = 14, gap = 0.055;
+  const segs = portfolio.concat([{ alloc: (eurAxValueGBP / portfolioTotalGBP()) * 100, color: EUR_AX.color }]);
+  const tot = segs.reduce((s, p) => s + p.alloc, 0);
   let angle = -Math.PI / 2;
-
-  PORTFOLIO.forEach(seg => {
+  segs.forEach(seg => {
     const sweep = (seg.alloc / tot) * 2 * Math.PI - gap;
+    if (sweep <= 0) return;
     ctx.beginPath();
     ctx.arc(cx, cy, r, angle, angle + sweep);
     ctx.strokeStyle = seg.color;
@@ -788,47 +1102,110 @@ function drawDonut() {
   });
 }
 
+function portfolioTotalGBP() {
+  return portfolio.reduce((s, p) => s + p.value, 0) + eurAxValueGBP;
+}
+
+function updateDonutCenter() {
+  const tot = portfolioTotalGBP();
+  const investedBase = portfolio.reduce((s, p) => s + p.value / (1 + p.gain / 100), 0) + EUR_AX.invested;
+  const gainPct = ((tot - investedBase) / investedBase) * 100;
+  document.getElementById('donutTotal').textContent = '£' + tot.toFixed(2);
+  const pctEl = document.getElementById('donutPct');
+  pctEl.textContent = (gainPct >= 0 ? '+' : '') + gainPct.toFixed(2) + '%';
+  pctEl.style.color = gainPct >= 0 ? 'var(--green)' : 'var(--red)';
+}
+
 /* ══════════════════════════════════════
    HOLDINGS
 ══════════════════════════════════════ */
 function renderHoldings() {
-  document.getElementById('holdingsList').innerHTML = PORTFOLIO.map((h, i) => `
+  const tot = portfolioTotalGBP();
+  const rows = portfolio.map((h, i) => `
     ${ i ? '<div class="divider" style="margin:0"></div>' : '' }
     <div class="holding-row">
       <div class="h-dot" style="background:${h.color}"></div>
       <div class="h-info">
         <div class="h-name">${h.name}</div>
-        <div class="h-sub">${h.alloc}%${ h.ticker ? ` &middot; <span id="px-${h.ticker}">—</span>` : '' }</div>
+        <div class="h-sub">${((h.value/tot)*100).toFixed(1)}%${ h.ticker ? ` · <span id="px-${h.ticker}">—</span>` : '' }</div>
       </div>
       <div class="h-right">
         <div class="h-val">£${h.value.toFixed(2)}</div>
-        <div class="h-gain ${h.gain >= 0 ? 'pos' : 'neg'}">${h.gain >= 0 ? '+' : ''}${h.gain}%</div>
+        <div class="h-gain ${h.gain >= 0 ? 'pos' : 'neg'}">${h.gain >= 0 ? '+' : ''}${h.gain.toFixed(2)}%</div>
       </div>
     </div>
   `).join('');
+
+  // EUR.AX live row
+  const eurGain = ((eurAxValueGBP - EUR_AX.invested) / EUR_AX.invested) * 100;
+  const eurRow = `
+    <div class="divider" style="margin:0"></div>
+    <div class="holding-row">
+      <div class="h-dot" style="background:${EUR_AX.color}"></div>
+      <div class="h-info">
+        <div class="h-name">EUR.AX</div>
+        <div class="h-sub">${((eurAxValueGBP/tot)*100).toFixed(1)}% · <span id="px-EUR-AX">—</span></div>
+      </div>
+      <div class="h-right">
+        <div class="h-val">£${eurAxValueGBP.toFixed(2)}</div>
+        <div class="h-gain ${eurGain >= 0 ? 'pos' : 'neg'}">${eurGain >= 0 ? '+' : ''}${eurGain.toFixed(2)}%</div>
+      </div>
+    </div>`;
+
+  document.getElementById('holdingsList').innerHTML = rows + eurRow;
+  updateDonutCenter();
 }
 
 /* ══════════════════════════════════════
-   LIVE PRICES
+   LIVE PRICES + FX
 ══════════════════════════════════════ */
-async function fetchPrices() {
-  const tickers = PORTFOLIO.filter(p => p.ticker).map(p => p.ticker);
-  let anyLive   = false;
+async function fetchOne(symbol) {
+  try {
+    const url   = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1d`;
+    const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+    const res   = await fetch(proxy, { signal: AbortSignal.timeout(8000) });
+    const json  = await res.json();
+    return json?.chart?.result?.[0]?.meta?.regularMarketPrice || null;
+  } catch (_) { return null; }
+}
 
-  await Promise.allSettled(tickers.map(async ticker => {
-    try {
-      const url   = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
-      const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-      const res   = await fetch(proxy, { signal: AbortSignal.timeout(7000) });
-      const json  = await res.json();
-      const price = json?.chart?.result?.[0]?.meta?.regularMarketPrice;
-      if (price) {
-        const el = document.getElementById(`px-${ticker}`);
-        if (el) el.textContent = `$${price.toFixed(2)}`;
-        anyLive = true;
+async function fetchPrices() {
+  // Fetch FX first
+  const [usd, aud] = await Promise.all([fetchOne('GBPUSD=X'), fetchOne('AUDGBP=X')]);
+  if (usd) fxGBPUSD = usd; // 1 GBP = X USD
+  if (aud) fxAUDGBP = aud; // 1 AUD = X GBP
+
+  let anyLive = false;
+
+  // US tickers from portfolio
+  const usTickers = portfolio.filter(p => p.ticker).map(p => p.ticker);
+  await Promise.allSettled(usTickers.map(async t => {
+    const px = await fetchOne(t);
+    if (px) {
+      livePrices[t] = px;
+      const el = document.getElementById(`px-${t}`);
+      if (el) {
+        if (fxGBPUSD) {
+          const gbp = px / fxGBPUSD;
+          el.textContent = `£${gbp.toFixed(2)}`;
+        } else {
+          el.textContent = `$${px.toFixed(2)}`;
+        }
       }
-    } catch (_) { /* silent */ }
+      anyLive = true;
+    }
   }));
+
+  // EUR.AX in AUD
+  const eurAud = await fetchOne('EUR.AX');
+  if (eurAud && fxAUDGBP) {
+    eurAxValueGBP = EUR_AX.shares * eurAud * fxAUDGBP;
+    const el = document.getElementById('px-EUR-AX');
+    if (el) el.textContent = `A$${eurAud.toFixed(2)}`;
+    anyLive = true;
+    renderHoldings();
+    drawDonut();
+  }
 
   const badge = document.getElementById('priceBadge');
   if (anyLive) {
@@ -856,12 +1233,12 @@ function renderMeals() {
   const i  = mealIdx();
   const pb = i % 3;
   const slots = [
-    { time:'Breakfast', meal: MEALS.breakfast[i]  },
-    { time:'Snack',     meal: MEALS.snack[i]       },
-    { time:'Lunch',     meal: MEALS.lunch[i]       },
-    { time:'Snack',     meal: MEALS.afternoon[i]   },
-    { time:'Dinner',    meal: MEALS.dinner[i]      },
-    { time:'Pre-bed',   meal: MEALS.preBed[pb]     },
+    { time:'Breakfast', meal: MEALS.breakfast[i] },
+    { time:'Snack',     meal: MEALS.snack[i]      },
+    { time:'Lunch',     meal: MEALS.lunch[i]      },
+    { time:'Snack',     meal: MEALS.afternoon[i]  },
+    { time:'Dinner',    meal: MEALS.dinner[i]     },
+    { time:'Pre-bed',   meal: MEALS.preBed[pb]    },
   ];
   document.getElementById('mealsList').innerHTML = slots.map((s, idx) => `
     ${ idx ? '<div class="divider" style="margin:0"></div>' : '' }
@@ -897,7 +1274,7 @@ function renderWorkout() {
    HABITS
 ══════════════════════════════════════ */
 function renderHabits() {
-  document.getElementById('habitsList').innerHTML = HABITS.map((h, i) => `
+  document.getElementById('habitsList').innerHTML = habits.map((h, i) => `
     ${ i ? '<div class="divider" style="margin:0"></div>' : '' }
     <div class="habit-row">
       <div class="habit-check${ habitState[h.key] ? ' checked' : '' }" data-key="${h.key}">
@@ -906,20 +1283,20 @@ function renderHabits() {
       <div class="habit-label">${h.label}</div>
     </div>
   `).join('');
-
-  document.getElementById('habitsList').addEventListener('click', e => {
-    const el = e.target.closest('.habit-check');
-    if (!el) return;
-    const key = el.dataset.key;
-    habitState[key] = !habitState[key];
-    el.classList.toggle('checked', habitState[key]);
-    el.classList.remove('pop');
-    void el.offsetWidth; // reflow to restart animation
-    el.classList.add('pop');
-    el.addEventListener('animationend', () => el.classList.remove('pop'), { once: true });
-    localStorage.setItem('habits_v2', JSON.stringify(habitState));
-  });
 }
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('#habitsList .habit-check');
+  if (!el) return;
+  const key = el.dataset.key;
+  habitState[key] = !habitState[key];
+  el.classList.toggle('checked', habitState[key]);
+  el.classList.remove('pop');
+  void el.offsetWidth;
+  el.classList.add('pop');
+  el.addEventListener('animationend', () => el.classList.remove('pop'), { once: true });
+  localStorage.setItem('habits_v2', JSON.stringify(habitState));
+});
 
 /* ══════════════════════════════════════
    GOLF
@@ -937,8 +1314,7 @@ function initGolf() {
     input.style.display   = 'block';
     input.focus();
   });
-
-  function save() {
+  function saveHcap() {
     const v = parseFloat(input.value);
     if (!isNaN(v) && v >= 0 && v <= 54) {
       handicap = Math.round(v * 10) / 10;
@@ -949,18 +1325,17 @@ function initGolf() {
     editBtn.style.display = '';
     input.style.display   = 'none';
   }
-
-  input.addEventListener('blur', save);
+  input.addEventListener('blur', saveHcap);
   input.addEventListener('keydown', e => { if (e.key === 'Enter') input.blur(); });
 }
 
 /* ══════════════════════════════════════
-   SKILLS
+   SKILLS GRID
 ══════════════════════════════════════ */
 function renderSkills() {
   document.getElementById('skillsGrid').innerHTML = SKILLS_DATA.map(s => `
     <div class="skill-card${ s.live ? '' : ' soon' }"
-      ${ s.live ? `onclick="openClaude('${s.trigger}')"` : '' }
+      ${ s.live ? `data-trigger="${s.trigger}"` : '' }
       role="${ s.live ? 'button' : 'article' }">
       <div class="skill-icon" style="background:${s.bg}">
         <i class="ti ${s.icon}" style="color:${s.color}"></i>
@@ -972,6 +1347,9 @@ function renderSkills() {
       </div>
     </div>
   `).join('');
+  document.querySelectorAll('#skillsGrid .skill-card[data-trigger]').forEach(c => {
+    c.addEventListener('click', () => openClaude(c.dataset.trigger));
+  });
 }
 
 /* ══════════════════════════════════════
@@ -994,7 +1372,6 @@ function applyTheme(light) {
   document.documentElement.classList.toggle('light', light);
   document.querySelector('#themeBtn i').className = light ? 'ti ti-moon' : 'ti ti-sun';
   localStorage.setItem('theme', light ? 'light' : 'dark');
-  // Update chart colors if rendered
   if (usageChart) {
     const tickColor = light ? 'rgba(0,0,0,0.28)' : 'rgba(255,255,255,0.28)';
     usageChart.options.scales.x.ticks.color = tickColor;
@@ -1006,13 +1383,169 @@ document.getElementById('themeBtn').addEventListener('click', () =>
 );
 
 /* ══════════════════════════════════════
+   MODAL / SHEET SYSTEM
+══════════════════════════════════════ */
+const backdrop = document.getElementById('backdrop');
+let openSheet = null;
+function showSheet(id) {
+  if (openSheet) closeSheet();
+  const sh = document.getElementById(id);
+  sh.classList.add('show');
+  backdrop.classList.add('show');
+  openSheet = sh;
+}
+function closeSheet() {
+  if (!openSheet) return;
+  openSheet.classList.remove('show');
+  backdrop.classList.remove('show');
+  openSheet = null;
+}
+backdrop.addEventListener('click', closeSheet);
+document.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeSheet));
+
+/* ── Tee time sheet ── */
+document.getElementById('teeTimeCard').addEventListener('click', () => {
+  const inp = document.getElementById('teeTimeInput');
+  const crs = document.getElementById('teeCourseInput');
+  if (teeTime) {
+    inp.value = teeTime.iso ? teeTime.iso.slice(0, 16) : '';
+    crs.value = teeTime.course || '';
+  } else {
+    inp.value = '';
+    crs.value = '';
+  }
+  showSheet('sheetTeeTime');
+});
+document.getElementById('teeSaveBtn').addEventListener('click', () => {
+  const v = document.getElementById('teeTimeInput').value;
+  const c = document.getElementById('teeCourseInput').value.trim();
+  if (!v) return;
+  teeTime = { iso: v, course: c };
+  save('teeTime', teeTime);
+  renderTeeTime();
+  closeSheet();
+});
+document.getElementById('teeClearBtn').addEventListener('click', () => {
+  teeTime = null;
+  localStorage.removeItem('teeTime');
+  renderTeeTime();
+  closeSheet();
+});
+
+/* ── Quick Actions sheet ── */
+document.getElementById('editActionsBtn').addEventListener('click', () => {
+  document.getElementById('actionsToggleList').innerHTML = SKILLS_DATA.map(s => `
+    <div class="sheet-row">
+      <div class="sheet-icon" style="background:${s.bg}"><i class="ti ${s.icon}" style="color:${s.color}"></i></div>
+      <div class="label-text">${s.name}<div class="sub">${s.live ? 'Live' : 'Coming soon'}</div></div>
+      <div class="toggle ${activeActions.includes(s.key) ? 'on' : ''}" data-key="${s.key}"></div>
+    </div>
+  `).join('');
+  document.querySelectorAll('#actionsToggleList .toggle').forEach(t => {
+    t.addEventListener('click', () => {
+      const k = t.dataset.key;
+      if (activeActions.includes(k)) {
+        activeActions = activeActions.filter(x => x !== k);
+        t.classList.remove('on');
+      } else {
+        activeActions.push(k);
+        t.classList.add('on');
+      }
+      save('activeActions', activeActions);
+      renderQuickActions();
+    });
+  });
+  showSheet('sheetActions');
+});
+
+/* ── Portfolio sheet ── */
+function renderPortfolioEditList() {
+  document.getElementById('portfolioEditList').innerHTML = portfolio.map((h, i) => `
+    <div class="sheet-row">
+      <div class="h-dot" style="background:${h.color};width:12px;height:12px"></div>
+      <div class="label-text">${h.name}<div class="sub">£${h.value.toFixed(2)} · ${h.gain >= 0 ? '+' : ''}${h.gain.toFixed(2)}%${h.ticker ? ' · ' + h.ticker : ''}</div></div>
+      <div class="del-btn" data-i="${i}"><i class="ti ti-trash"></i></div>
+    </div>
+  `).join('');
+  document.querySelectorAll('#portfolioEditList .del-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      portfolio.splice(parseInt(b.dataset.i, 10), 1);
+      save('portfolio_v2', portfolio);
+      renderPortfolioEditList();
+      renderHoldings();
+      drawDonut();
+    });
+  });
+}
+document.getElementById('editPortfolioBtn').addEventListener('click', () => {
+  renderPortfolioEditList();
+  showSheet('sheetPortfolio');
+});
+document.getElementById('addHoldingBtn').addEventListener('click', () => {
+  const name = document.getElementById('newHoldingName').value.trim();
+  const ticker = document.getElementById('newHoldingTicker').value.trim().toUpperCase();
+  const value = parseFloat(document.getElementById('newHoldingValue').value);
+  const gain  = parseFloat(document.getElementById('newHoldingGain').value);
+  if (!name || isNaN(value)) return;
+  const palette = ['#0a84ff','#bf5af2','#64d2ff','#ff9f0a','#ff453a','#30d158','#ffd60a','#ff375f'];
+  const used = portfolio.map(p => p.color);
+  const color = palette.find(c => !used.includes(c)) || palette[portfolio.length % palette.length];
+  const h = { name, value, gain: isNaN(gain) ? 0 : gain, alloc: 0, color };
+  if (ticker) h.ticker = ticker;
+  portfolio.push(h);
+  save('portfolio_v2', portfolio);
+  document.getElementById('newHoldingName').value = '';
+  document.getElementById('newHoldingTicker').value = '';
+  document.getElementById('newHoldingValue').value = '';
+  document.getElementById('newHoldingGain').value = '';
+  renderPortfolioEditList();
+  renderHoldings();
+  drawDonut();
+  fetchPrices();
+});
+
+/* ── Habits sheet ── */
+function renderHabitsEditList() {
+  document.getElementById('habitsEditList').innerHTML = habits.map((h, i) => `
+    <div class="sheet-row">
+      <div class="sheet-icon" style="background:rgba(48,209,88,0.12)"><i class="ti ti-circle-check" style="color:var(--green)"></i></div>
+      <div class="label-text">${h.label}</div>
+      <div class="del-btn" data-i="${i}"><i class="ti ti-trash"></i></div>
+    </div>
+  `).join('');
+  document.querySelectorAll('#habitsEditList .del-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      const i = parseInt(b.dataset.i, 10);
+      const removed = habits.splice(i, 1)[0];
+      delete habitState[removed.key];
+      save('habitsList_v2', habits);
+      save('habits_v2', habitState);
+      renderHabitsEditList();
+      renderHabits();
+    });
+  });
+}
+document.getElementById('editHabitsBtn').addEventListener('click', () => {
+  renderHabitsEditList();
+  showSheet('sheetHabits');
+});
+document.getElementById('addHabitBtn').addEventListener('click', () => {
+  const label = document.getElementById('newHabitLabel').value.trim();
+  if (!label) return;
+  const key = 'h_' + Date.now();
+  habits.push({ key, label });
+  save('habitsList_v2', habits);
+  document.getElementById('newHabitLabel').value = '';
+  renderHabitsEditList();
+  renderHabits();
+});
+
+/* ══════════════════════════════════════
    INIT
 ══════════════════════════════════════ */
 function init() {
-  // Theme
   if (localStorage.getItem('theme') === 'light') applyTheme(true);
 
-  // Reset today's habits (new day = fresh slate)
   const lastDay = localStorage.getItem('habitsDay');
   const todayKey = today.toISOString().slice(0, 10);
   if (lastDay !== todayKey) {
@@ -1030,13 +1563,12 @@ function init() {
   renderSkills();
   initGolf();
   initUsageChart();
+  fetchWeather();
 
-  // Count-up on first load
   setTimeout(() => {
     document.querySelectorAll('[data-count]').forEach(countUp);
   }, 150);
 
-  // Live prices (non-blocking)
   fetchPrices();
 }
 
