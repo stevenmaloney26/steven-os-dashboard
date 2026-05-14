@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /Users/stevenmaloney/agentic-os/references /Users/stevenmaloney/agentic-os/.claude/skills/generate-morning-market-briefing/evals)",
+      "Bash(mkdir -p /Users/stevenmaloney/agentic-os/.claude/skills/capture-the-idea/evals \\\\ *)",
+      "Bash(mkdir -p /Users/stevenmaloney/agentic-os/.claude/skills/run-the-daily-check-in/evals \\\\ *)",
+      "WebSearch"
+    ]
+  }
+}

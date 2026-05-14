@@ -1,0 +1,23 @@
+{
+  "skill_name": "generate-morning-market-briefing",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Morning briefing please",
+      "expected_output": "A structured 4-section market briefing with Market Mood, My Positions Update, Worth Looking At Today, and Crypto Snapshot. Under 300 words, plain English, includes specific numbers.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "What's the market doing today? Anything I should know about my stocks?",
+      "expected_output": "A briefing covering overall market mood and specific updates on held tickers (AAPL, NVDA, TSLA, MSFT). Should include pre-market or overnight moves with actual percentage figures.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Run my morning brief — NVDA has been on a run this week, curious if anything happened overnight",
+      "expected_output": "Full briefing with particular attention to NVDA in the positions section. Should search for NVDA-specific news and reflect it clearly.",
+      "files": []
+    }
+  ]
+}

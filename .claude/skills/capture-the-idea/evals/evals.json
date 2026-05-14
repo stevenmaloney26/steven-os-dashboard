@@ -1,0 +1,23 @@
+{
+  "skill_name": "capture-the-idea",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Capture this — what if I built a simple tool that emails Caterspares clients a monthly health score for their account? Like a mini report card showing orders, spend trend, and whether they're overdue anything.",
+      "expected_output": "A filed confirmation with title, domain (crm-client-work), tags, link to caterspares-crm project, and the single follow-up question. File saved to raw/.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "Don't let me forget — look into whether AMD suppliers are publicly traded. If NVDA wins, the people making their chips win too. There might be a play there.",
+      "expected_output": "Filed as a trading/investing idea with tags around AI, supply chain, AMD/NVDA. Domain: trading-money. Single follow-up question asked.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Park this: I keep meaning to find a good photography spot near the Peak District for golden hour. Something with open moorland and a decent foreground.",
+      "expected_output": "Filed as an adventures/interests idea. Short title. Domain: adventures-interests. Tags around photography, travel. Single follow-up question.",
+      "files": []
+    }
+  ]
+}

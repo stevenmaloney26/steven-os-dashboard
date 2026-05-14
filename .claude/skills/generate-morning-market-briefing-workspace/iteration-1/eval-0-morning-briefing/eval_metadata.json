@@ -1,0 +1,23 @@
+{
+  "eval_id": 0,
+  "eval_name": "morning-briefing",
+  "prompt": "Morning briefing please",
+  "assertions": [
+    {
+      "id": "all-four-sections",
+      "description": "Output contains all 4 required sections: Market Mood, My Positions Update, Worth Looking At Today, Crypto Snapshot"
+    },
+    {
+      "id": "under-300-words",
+      "description": "Total word count of the briefing is 300 words or fewer"
+    },
+    {
+      "id": "includes-specific-numbers",
+      "description": "Output includes at least one specific number — a percentage move, price level, or index value"
+    },
+    {
+      "id": "references-held-tickers",
+      "description": "Output mentions at least one of Steven's held stocks: AAPL, NVDA, TSLA, or MSFT"
+    }
+  ]
+}

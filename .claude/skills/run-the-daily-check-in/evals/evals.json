@@ -1,0 +1,23 @@
+{
+  "skill_name": "run-the-daily-check-in",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Daily check-in",
+      "expected_output": "A clean daily card with Today's Meals, Today's Workout, Today's Habits sections. Under 200 words. Ends with a one-line log prompt. Correct day and workout session for today (Tuesday = Lower Body + KneesOverToes).",
+      "files": []
+    },
+    {
+      "id": 1,
+      "prompt": "What's my workout today?",
+      "expected_output": "Full daily card triggered by workout question. Shows correct session for today with exercises and sets/reps. Includes meals and habits even though only workout was asked — skill produces the full card.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Morning check-in — it's Wednesday",
+      "expected_output": "Mobility day card. Workout section shows mobility stretches not gym exercises. Meals shown. Habits shown. Under 200 words.",
+      "files": []
+    }
+  ]
+}
