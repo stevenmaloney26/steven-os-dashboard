@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Steven's OS</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* ─── DESIGN TOKENS ─── */
+    :root {
+      --bg:          #0d0d0f;
+      --card:        #1a1a1f;
+      --border:      rgba(255,255,255,0.07);
+      --shadow:      0 2px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+      --text:        #ffffff;
+      --label:       rgba(255,255,255,0.4);
+      --divider:     rgba(255,255,255,0.06);
+      --green:       #30d158;
+      --red:         #ff453a;
+      --blue:        #0a84ff;
+      --gap:         16px;
+      --pad:         20px;
+      --r-card:      20px;
+      --r-sm:        12px;
+    }
+    html.light {
+      --bg:      #f2f2f7;
+      --card:    #ffffff;
+      --border:  rgba(0,0,0,0.07);
+      --shadow:  0 2px 16px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+      --text:    #1c1c1e;
+      --label:   rgba(0,0,0,0.38);
+      --divider: rgba(0,0,0,0.06);
+    }
+
+    /* ─── RESET ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    button { background: none; border: none; cursor: pointer; font: inherit; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ─── BASE ─── */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      overscroll-behavior: none;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .app {
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100dvh;
+      position: relative;
+      overflow: hidden;
+    }
+    @media (min-width: 431px) {
+      body { background: #080809; }
+      .app { box-shadow: 0 0 80px rgba(0,0,0,0.7); background: var(--bg); }
+    }
+
+    /* ─── TAB PANELS ─── */
+    .tab-panel {
+      position: absolute;
+      inset: 0 0 calc(60px + env(safe-area-inset-bottom, 0px)) 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: calc(env(safe-area-inset-top, 0px) + 12px) var(--gap) 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .tab-panel::-webkit-scrollbar { display: none; }
+    .tab-panel.active { opacity: 1; pointer-events: all; }
+
+    /* ─── TAB BAR ─── */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      height: calc(60px + env(safe-area-inset-bottom, 0px));
+      background: rgba(26,26,31,0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 0.5px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      padding-top: 10px;
+      z-index: 100;
+    }
+    .tab-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: opacity 100ms;
+    }
+    .tab-item:active { opacity: 0.6; }
+    .tab-item i { font-size: 22px; color: var(--label); transition: color 200ms; }
+    .tab-item span { font-size: 10px; letter-spacing: 0.3px; color: var(--label); transition: color 200ms; }
+    .tab-item.active i,
+    .tab-item.active span { color: var(--green); }
+
+    /* ─── CARD ─── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      padding: var(--pad);
+      box-shadow: var(--shadow);
+      margin-bottom: var(--gap);
+    }
+
+    /* ─── TYPE ─── */
+    .page-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
+    .section-title { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; margin-bottom: 14px; }
+    .label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--label);
+      font-weight: 600;
+    }
+    .divider { height: 0.5px; background: var(--divider); margin: 10px 0; }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.55; transform: scale(0.82); }
+    }
+    @keyframes habitPop {
+      0%   { transform: scale(1); }
+      45%  { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+    .fade-in { opacity: 0; animation: fadeUp 380ms ease forwards; }
+
+    /* ─── HOME ─── */
+    .home-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 6px 0 20px;
+    }
+    .home-greeting { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.1; }
+    .home-date { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--label); margin-top: 6px; }
+    .theme-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--card); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; margin-top: 2px;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .theme-btn i { font-size: 18px; color: var(--label); }
+
+    /* Stat row */
+    .stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: var(--gap); }
+    .stat-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--r-card); padding: 14px 12px;
+      box-shadow: var(--shadow);
+    }
+    .stat-card .label { display: block; margin-bottom: 8px; }
+    .stat-value { font-size: 14px; font-weight: 700; letter-spacing: -0.3px; line-height: 1.25; }
+    .stat-sub { font-size: 10px; margin-top: 3px; color: var(--label); }
+
+    /* Quick actions */
+    .action-btn {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 15px var(--pad); display: flex; align-items: center; gap: 12px;
+      width: 100%; margin-bottom: 10px; box-shadow: var(--shadow);
+      -webkit-tap-highlight-color: transparent; transition: transform 100ms, opacity 100ms;
+    }
+    .action-btn:active { opacity: 0.7; transform: scale(0.985); }
+    .action-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: rgba(10,132,255,0.12);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .action-icon i { font-size: 19px; color: var(--blue); }
+    .action-label { flex: 1; font-size: 15px; font-weight: 600; letter-spacing: -0.2px; color: var(--text); }
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0;
+      animation: pulse 2.2s ease-in-out infinite;
+    }
+
+    /* Usage card */
+    .usage-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
+    .usage-stat { text-align: center; }
+    .usage-stat .num { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    .usage-stat .label { margin-top: 3px; display: block; }
+    .chart-wrap { height: 72px; margin-bottom: 14px; }
+    .prog-track { flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
+    html.light .prog-track { background: rgba(0,0,0,0.08); }
+    .prog-fill { height: 100%; background: var(--green); border-radius: 2px; width: 0; transition: width 1s ease; }
+    .prog-label { font-size: 11px; color: var(--label); white-space: nowrap; }
+
+    /* ─── PORTFOLIO ─── */
+    .port-header { display: flex; justify-content: space-between; align-items: center; padding: 6px 0 20px; }
+    .live-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+      padding: 4px 9px; border-radius: 20px;
+    }
+    .live-badge.live { background: rgba(48,209,88,0.12); color: var(--green); }
+    .live-badge.cached { background: rgba(255,255,255,0.06); color: var(--label); }
+    html.light .live-badge.cached { background: rgba(0,0,0,0.06); }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .live-badge.live .badge-dot { animation: pulse 2.2s ease-in-out infinite; }
+
+    .donut-wrap { display: flex; justify-content: center; align-items: center; position: relative; height: 210px; margin-bottom: 6px; }
+    .donut-center { position: absolute; text-align: center; pointer-events: none; }
+    .donut-total { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+    .donut-pct { font-size: 13px; font-weight: 600; color: var(--green); margin-top: 2px; }
+
+    .holding-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; }
+    .h-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .h-info { flex: 1; min-width: 0; }
+    .h-name { font-size: 14px; font-weight: 600; letter-spacing: -0.2px; }
+    .h-sub { font-size: 11px; color: var(--label); margin-top: 1px; }
+    .h-right { text-align: right; flex-shrink: 0; }
+    .h-val { font-size: 14px; font-weight: 700; letter-spacing: -0.2px; }
+    .h-gain { font-size: 11px; font-weight: 600; margin-top: 1px; }
+    .pos { color: var(--green); }
+    .neg { color: var(--red); }
+
+    /* ─── HEALTH ─── */
+    .health-header { padding: 6px 0 20px; }
+    .meal-row { display: flex; align-items: flex-start; gap: 12px; padding: 9px 0; }
+    .meal-time { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--label); font-weight: 600; width: 70px; flex-shrink: 0; padding-top: 2px; }
+    .meal-text { flex: 1; font-size: 13px; font-weight: 500; letter-spacing: -0.1px; line-height: 1.35; }
+    .swap-link { display: block; margin-top: 12px; font-size: 13px; color: var(--blue); font-weight: 500; cursor: pointer; text-align: right; -webkit-tap-highlight-color: transparent; }
+    .swap-link:active { opacity: 0.5; }
+
+    .ex-row { display: flex; align-items: center; padding: 9px 0; }
+    .ex-name { flex: 1; font-size: 14px; font-weight: 500; letter-spacing: -0.1px; }
+    .ex-reps { font-size: 13px; font-weight: 700; color: var(--label); }
+
+    .habit-row { display: flex; align-items: center; gap: 14px; padding: 11px 0; }
+    .habit-check {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.14); background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0;
+      transition: background 180ms, border-color 180ms;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html.light .habit-check { border-color: rgba(0,0,0,0.16); }
+    .habit-check.checked { background: var(--green); border-color: var(--green); }
+    .habit-check i { font-size: 13px; color: #fff; opacity: 0; transition: opacity 150ms; }
+    .habit-check.checked i { opacity: 1; }
+    .habit-check.pop { animation: habitPop 220ms ease; }
+    .habit-label { flex: 1; font-size: 14px; font-weight: 500; letter-spacing: -0.1px; }
+
+    .golf-card { background: #0f1f0f; border-color: rgba(48,209,88,0.15); }
+    html.light .golf-card { background: #eaf7ed; border-color: rgba(48,209,88,0.25); }
+    .hcap-row { display: flex; align-items: flex-end; gap: 10px; margin-top: 8px; }
+    .hcap-num { font-size: 52px; font-weight: 700; letter-spacing: -2px; line-height: 1; }
+    .hcap-edit { padding-bottom: 8px; cursor: pointer; color: var(--label); -webkit-tap-highlight-color: transparent; }
+    .hcap-edit i { font-size: 18px; }
+    .hcap-input {
+      font-size: 52px; font-weight: 700; letter-spacing: -2px;
+      background: transparent; border: none; border-bottom: 2px solid var(--green);
+      color: var(--text); width: 130px; outline: none;
+      font-family: inherit; line-height: 1; display: none;
+    }
+    .golf-footer { display: flex; justify-content: space-between; margin-top: 14px; padding-top: 14px; border-top: 0.5px solid rgba(48,209,88,0.1); }
+
+    /* ─── SKILLS ─── */
+    .skills-header { display: flex; align-items: center; gap: 10px; padding: 6px 0 20px; }
+    .skills-badge { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; background: rgba(48,209,88,0.12); color: var(--green); padding: 3px 9px; border-radius: 20px; }
+    .skills-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: var(--gap); }
+    .skill-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 16px; box-shadow: var(--shadow); cursor: pointer;
+      transition: transform 100ms, opacity 100ms;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .skill-card.soon { opacity: 0.45; cursor: default; }
+    .skill-card:not(.soon):active { transform: scale(0.96); opacity: 0.75; }
+    .skill-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 12px;
+    }
+    .skill-icon i { font-size: 20px; }
+    .skill-name { font-size: 13px; font-weight: 700; letter-spacing: -0.2px; margin-bottom: 7px; line-height: 1.2; }
+    .skill-status { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .skill-status.live { color: var(--green); }
+    .skill-status.live .status-dot { animation: pulse 2.2s ease-in-out infinite; }
+    .skill-status.soon { color: var(--label); }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ═══════════ HOME ═══════════ -->
+  <div class="tab-panel active" id="panel-home">
+
+    <div class="home-header">
+      <div>
+        <div class="home-greeting" id="greeting">Good morning, Steven</div>
+        <div class="home-date" id="homeDate"></div>
+      </div>
+      <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">
+        <i class="ti ti-sun"></i>
+      </button>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="stat-row">
+      <div class="stat-card fade-in" style="animation-delay:0ms">
+        <span class="label">Portfolio</span>
+        <div class="stat-value" data-count="782.42" data-prefix="£" data-dec="2">£0</div>
+        <div class="stat-sub pos">+11.80%</div>
+      </div>
+      <div class="stat-card fade-in" style="animation-delay:120ms">
+        <span class="label">Workout</span>
+        <div class="stat-value" id="todayWorkoutStat" style="font-size:12px;line-height:1.3"></div>
+      </div>
+      <div class="stat-card fade-in" style="animation-delay:240ms">
+        <span class="label">Tee Time</span>
+        <div class="stat-value" style="font-size:12px;color:var(--label)">Not booked</div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section-title fade-in" style="animation-delay:200ms">Quick Actions</div>
+    <div>
+      <button class="action-btn fade-in" style="animation-delay:250ms" onclick="openClaude('Morning briefing please')">
+        <div class="action-icon"><i class="ti ti-news"></i></div>
+        <span class="action-label">Morning Briefing</span>
+        <div class="live-dot"></div>
+      </button>
+      <button class="action-btn fade-in" style="animation-delay:350ms" onclick="openClaude('Daily check-in')">
+        <div class="action-icon"><i class="ti ti-heart-rate-monitor"></i></div>
+        <span class="action-label">Daily Check-In</span>
+        <div class="live-dot"></div>
+      </button>
+      <button class="action-btn fade-in" style="animation-delay:450ms" onclick="openClaude('Capture this — ')">
+        <div class="action-icon"><i class="ti ti-bulb"></i></div>
+        <span class="action-label">Capture Idea</span>
+        <div class="live-dot"></div>
+      </button>
+    </div>
+
+    <!-- Claude Usage -->
+    <div class="card fade-in" style="animation-delay:350ms">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div class="section-title" style="margin-bottom:0">Claude Usage</div>
+        <div class="label">This week</div>
+      </div>
+      <div class="usage-stats">
+        <div class="usage-stat">
+          <div class="num" data-count="126" data-dec="0">0</div>
+          <div class="label">Messages</div>
+        </div>
+        <div class="usage-stat">
+          <div class="num" data-count="77.7" data-suffix="k" data-dec="1">0</div>
+          <div class="label">Tokens</div>
+        </div>
+        <div class="usage-stat">
+          <div class="num" data-count="3" data-dec="0">0</div>
+          <div class="label">Active Days</div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="usageChart"></canvas></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+        <span class="prog-label">77.7k / 500k</span>
+      </div>
+    </div>
+
+  </div><!-- /home -->
+
+  <!-- ═══════════ PORTFOLIO ═══════════ -->
+  <div class="tab-panel" id="panel-portfolio">
+
+    <div class="port-header">
+      <div class="page-title">Portfolio</div>
+      <div class="live-badge cached" id="priceBadge">
+        <div class="badge-dot"></div><span>Checking</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="donut-wrap">
+        <canvas id="donutCanvas"></canvas>
+        <div class="donut-center">
+          <div class="donut-total" data-count="782.42" data-prefix="£" data-dec="2">£0</div>
+          <div class="donut-pct">+11.80%</div>
+        </div>
+      </div>
+      <div id="holdingsList"></div>
+      <div class="divider"></div>
+      <!-- EUR.AX -->
+      <div class="holding-row">
+        <div class="h-dot" style="background:#ffd60a"></div>
+        <div class="h-info">
+          <div class="h-name">EUR.AX</div>
+          <div class="h-sub">ASX &middot; £0.26/share &middot; Hold</div>
+        </div>
+        <div class="h-right">
+          <div class="h-val">£500</div>
+          <div class="h-gain" style="color:var(--label)">Invested</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /portfolio -->
+
+  <!-- ═══════════ HEALTH ═══════════ -->
+  <div class="tab-panel" id="panel-health">
+
+    <div class="health-header"><div class="page-title">Health</div></div>
+
+    <!-- Meals -->
+    <div class="card">
+      <div class="section-title">Today's Meals</div>
+      <div id="mealsList"></div>
+      <span class="swap-link" id="swapLink">Not feeling these? Swap &rarr;</span>
+    </div>
+
+    <!-- Workout -->
+    <div class="card">
+      <div class="section-title" id="workoutTitle">Today's Workout</div>
+      <div id="exerciseList"></div>
+    </div>
+
+    <!-- Habits -->
+    <div class="card">
+      <div class="section-title">Today's Habits</div>
+      <div id="habitsList"></div>
+    </div>
+
+    <!-- Golf -->
+    <div class="card golf-card">
+      <div class="label">Handicap</div>
+      <div class="hcap-row">
+        <div class="hcap-num" id="hcapDisplay">15.1</div>
+        <input type="number" id="hcapInput" class="hcap-input" step="0.1" min="0" max="54">
+        <div class="hcap-edit" id="hcapEditBtn" title="Edit">
+          <i class="ti ti-pencil"></i>
+        </div>
+      </div>
+      <div class="golf-footer">
+        <div>
+          <div class="label">Best Round</div>
+          <div style="font-size:16px;font-weight:700;margin-top:4px">83</div>
+        </div>
+        <div style="text-align:right">
+          <div class="label">Course</div>
+          <div style="font-size:12px;font-weight:500;color:var(--label);margin-top:4px;max-width:150px;text-align:right">Hart Common Golf Club</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /health -->
+
+  <!-- ═══════════ SKILLS ═══════════ -->
+  <div class="tab-panel" id="panel-skills">
+    <div class="skills-header">
+      <div class="page-title">Skills</div>
+      <div class="skills-badge">3 live</div>
+    </div>
+    <div class="skills-grid" id="skillsGrid"></div>
+  </div><!-- /skills -->
+
+  <!-- ═══════════ TAB BAR ═══════════ -->
+  <nav class="tab-bar">
+    <div class="tab-item active" data-tab="home">
+      <i class="ti ti-home"></i><span>Home</span>
+    </div>
+    <div class="tab-item" data-tab="portfolio">
+      <i class="ti ti-chart-donut"></i><span>Portfolio</span>
+    </div>
+    <div class="tab-item" data-tab="health">
+      <i class="ti ti-heart-rate-monitor"></i><span>Health</span>
+    </div>
+    <div class="tab-item" data-tab="skills">
+      <i class="ti ti-bolt"></i><span>Skills</span>
+    </div>
+  </nav>
+
+</div><!-- /app -->
+
+<script>
+/* ══════════════════════════════════════
+   DATA
+══════════════════════════════════════ */
+const PORTFOLIO = [
+  { name:'Vanguard S&P 500',  alloc:47.75, value:373.64, gain: 6.75,  color:'#0a84ff' },
+  { name:'Vanguard All-World', alloc:33.86, value:264.91, gain: 8.13,  color:'#bf5af2' },
+  { name:'AMD',               alloc:11.19, value:87.57,  gain:78.97,  color:'#64d2ff', ticker:'AMD' },
+  { name:'Nvidia',            alloc: 5.12, value:40.06,  gain:14.62,  color:'#ff9f0a', ticker:'NVDA' },
+  { name:'Palantir',          alloc: 2.08, value:16.28,  gain:-22.37, color:'#ff453a', ticker:'PLTR' },
+];
+
+const WORKOUT_NAMES = {
+  0:'Rest Day', 1:'Upper Body Strength', 2:'Lower Body + Knees',
+  3:'Mobility Day', 4:'Upper Hypertrophy', 5:'Golf Power', 6:'Core + Speed',
+};
+const WORKOUT_EXERCISES = {
+  1:[
+    {n:'Pull-ups',                    r:'4 × 6–8'},
+    {n:'DB Row (chest supported)',    r:'4 × 8'},
+    {n:'Incline DB Press',            r:'4 × 8'},
+    {n:'Face Pulls',                  r:'4 × 15'},
+    {n:'Rear Delt Fly',               r:'4 × 12'},
+    {n:'DB Shrugs',                   r:'3 × 12'},
+    {n:'Dead Hangs',                  r:'3 × 30s'},
+  ],
+  2:[
+    {n:'ATG Split Squats',            r:'4 × 8 ea'},
+    {n:'Romanian Deadlift',           r:'4 × 8'},
+    {n:'Tibialis Raises',             r:'3 × 20'},
+    {n:'Nordic Hamstring Curl',       r:'3 × 6'},
+    {n:'Standing Calf Raises',        r:'4 × 12'},
+    {n:'Reverse Walking',             r:'10 min'},
+  ],
+  3:[
+    {n:'20–30 min walk',              r:'Daily'},
+    {n:"Child's pose",                r:'1 min'},
+    {n:'Thread the needle',           r:'1 min ea'},
+    {n:'Cat cow',                     r:'1 min'},
+    {n:'Pigeon stretch',              r:'1 min ea'},
+    {n:'Hip flexor stretch',          r:'1 min ea'},
+  ],
+  4:[
+    {n:'Barbell Bench Press',         r:'4 × 6–8'},
+    {n:'Lat Pulldown',                r:'4 × 10'},
+    {n:'Seated Cable Row',            r:'4 × 10'},
+    {n:'DB Lateral Raises',           r:'4 × 12'},
+    {n:'Rear Delt Cable Fly',         r:'4 × 12'},
+    {n:'Hammer Curls',                r:'3 × 10'},
+    {n:'Tricep Rope Pushdown',        r:'3 × 12'},
+  ],
+  5:[
+    {n:'Trap Bar Deadlift',           r:'4 × 5'},
+    {n:'Bulgarian Split Squats',      r:'3 × 8'},
+    {n:'Hip Thrusts',                 r:'4 × 8'},
+    {n:'Kettlebell Swings',           r:'3 × 15'},
+    {n:'Box Jumps',                   r:'3 × 6'},
+    {n:'Hanging Leg Raises',          r:'3 × 12'},
+  ],
+  6:[
+    {n:'Cable Woodchoppers',          r:'3 × 12'},
+    {n:'Pallof Press',                r:'3 × 12'},
+    {n:'Back Extensions',             r:'3 × 12'},
+    {n:'Neck Curls',                  r:'3 × 15'},
+    {n:'Neck Extensions',             r:'3 × 15'},
+    {n:'Farmer Carries',              r:'4 × 30m'},
+    {n:'Driver swings (100% speed)',  r:'10 swings'},
+  ],
+  0:[{n:'Rest — mobility and walking only', r:''}],
+};
+
+const MEALS = {
+  breakfast:[
+    '4 eggs, sourdough toast, butter, blueberries',
+    'Greek yogurt, oats, honey, banana',
+    '3 eggs, roasted potatoes, spinach, tomatoes',
+    'Skyr yogurt, granola, strawberries',
+    'Egg omelette, mushrooms, onions, sourdough',
+  ],
+  snack:[
+    'Greek yogurt, honey, cashews',
+    'Kefir and banana',
+    'Cottage cheese and apple',
+    '2 boiled eggs and fruit',
+    'Protein smoothie — milk, yogurt, banana, honey',
+  ],
+  lunch:[
+    'Grass-fed steak, potatoes, broccoli',
+    'Chicken thighs, rice, vegetables',
+    'Salmon, sweet potato, asparagus',
+    'Turkey mince bowl — rice, peppers, onions',
+    'Lamb mince, roasted vegetables, potatoes',
+  ],
+  afternoon:[
+    'Cottage cheese and berries',
+    'Greek yogurt, cashews, honey',
+    'Kefir smoothie — banana and milk',
+    'Sardines on sourdough toast',
+    '2 eggs and fruit',
+  ],
+  dinner:[
+    'Salmon, rice, asparagus',
+    'Steak, sweet potato, broccoli',
+    'Chicken thighs, roasted potatoes, green beans',
+    'Cod, rice, vegetables',
+    'Beef mince rice bowl — peppers and onions',
+  ],
+  preBed:[
+    'Greek yogurt and honey',
+    'Cottage cheese and berries',
+    'Kefir',
+  ],
+};
+
+const HABITS = [
+  {key:'supps',  label:'Supplements — creatine, mag, fish oil, D3, collagen'},
+  {key:'walk',   label:'20–30 min walk'},
+  {key:'prebed', label:'Pre-bed snack done'},
+];
+
+const SKILLS_DATA = [
+  {name:'Morning Briefing',   icon:'ti-news',               color:'#0a84ff', bg:'rgba(10,132,255,0.12)',  live:true,  trigger:'Morning briefing please'},
+  {name:'Daily Check-In',     icon:'ti-heart-rate-monitor', color:'#30d158', bg:'rgba(48,209,88,0.12)',   live:true,  trigger:'Daily check-in'},
+  {name:'Capture Idea',       icon:'ti-bulb',               color:'#ffd60a', bg:'rgba(255,214,10,0.12)',  live:true,  trigger:'Capture this — '},
+  {name:'Research Stock',     icon:'ti-trending-up',        color:'#64d2ff', bg:'rgba(100,210,255,0.12)', live:false},
+  {name:'Find Tee Time',      icon:'ti-golf',               color:'#30d158', bg:'rgba(48,209,88,0.12)',   live:false},
+  {name:'Plan Meals',         icon:'ti-chef-hat',           color:'#ff9f0a', bg:'rgba(255,159,10,0.12)',  live:false},
+  {name:"Today's Workout",    icon:'ti-barbell',            color:'#bf5af2', bg:'rgba(191,90,242,0.12)',  live:false},
+  {name:'AI Intel Brief',     icon:'ti-robot',              color:'#64d2ff', bg:'rgba(100,210,255,0.12)', live:false},
+  {name:'Plan a Trip',        icon:'ti-plane',              color:'#ff9f0a', bg:'rgba(255,159,10,0.12)',  live:false},
+  {name:'Weekend Activities', icon:'ti-compass',            color:'#bf5af2', bg:'rgba(191,90,242,0.12)',  live:false},
+  {name:'Weekly Spending',    icon:'ti-wallet',             color:'#30d158', bg:'rgba(48,209,88,0.12)',   live:false},
+];
+
+/* ══════════════════════════════════════
+   STATE
+══════════════════════════════════════ */
+const today      = new Date();
+const DOW        = today.getDay(); // 0=Sun
+let   mealSwap   = 0;
+let   habitState = JSON.parse(localStorage.getItem('habits_v2') || '{}');
+let   handicap   = parseFloat(localStorage.getItem('handicap') || '15.1');
+let   usageChart = null;
+
+/* ══════════════════════════════════════
+   HELPERS
+══════════════════════════════════════ */
+function mealIdx(extra = 0) {
+  // Mon(1)→0 … Fri(5)→4, then mod 5 for the 5 options
+  const base = ((DOW + 6) % 7) % 5;
+  return (base + mealSwap + extra) % 5;
+}
+
+function greeting() {
+  const h = today.getHours();
+  return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+}
+
+function fmtDate(d) {
+  return d.toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+}
+
+function openClaude(trigger) {
+  if (navigator.clipboard) navigator.clipboard.writeText(trigger).catch(()=>{});
+  window.open('https://claude.ai', '_blank');
+}
+
+/* ══════════════════════════════════════
+   COUNT-UP
+══════════════════════════════════════ */
+function countUp(el) {
+  const target = parseFloat(el.dataset.count);
+  const prefix = el.dataset.prefix || '';
+  const suffix = el.dataset.suffix || '';
+  const dec    = parseInt(el.dataset.dec  || '0', 10);
+  const dur    = 600;
+  const t0     = performance.now();
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+  (function tick(now) {
+    const p = Math.min((now - t0) / dur, 1);
+    const v = easeOut(p) * target;
+    el.textContent = prefix + v.toFixed(dec) + suffix;
+    if (p < 1) requestAnimationFrame(tick);
+  })(t0);
+}
+
+/* ══════════════════════════════════════
+   HOME
+══════════════════════════════════════ */
+function initHome() {
+  document.getElementById('greeting').textContent = greeting() + ', Steven';
+  document.getElementById('homeDate').textContent = fmtDate(today);
+  document.getElementById('todayWorkoutStat').textContent = WORKOUT_NAMES[DOW] || 'Rest Day';
+}
+
+function initUsageChart() {
+  // Mon=20k, Tue=45k, Wed=12.7k (today=Wed), rest=0
+  const dowIdx = ((DOW + 6) % 7); // Mon=0 … Sun=6
+  const raw    = [20000, 45000, 12700, 0, 0, 0, 0];
+  // Shift array so today's position has 12.7k
+  const data   = Array(7).fill(0);
+  data[dowIdx] = 12700;
+  if (dowIdx > 0) data[dowIdx - 1] = 45000;
+  if (dowIdx > 1) data[dowIdx - 2] = 20000;
+
+  const ctx = document.getElementById('usageChart').getContext('2d');
+  usageChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      datasets: [{
+        data,
+        borderColor: '#30d158',
+        borderWidth: 2,
+        tension: 0.42,
+        pointRadius: data.map(v => v > 0 ? 4 : 0),
+        pointBackgroundColor: '#30d158',
+        pointBorderColor: 'transparent',
+        fill: true,
+        backgroundColor: ctx2 => {
+          const g = ctx2.chart.ctx.createLinearGradient(0, 0, 0, 72);
+          g.addColorStop(0, 'rgba(48,209,88,0.2)');
+          g.addColorStop(1, 'rgba(48,209,88,0)');
+          return g;
+        },
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'nearest', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a1a1f',
+          borderColor: 'rgba(255,255,255,0.07)',
+          borderWidth: 1,
+          titleColor: 'rgba(255,255,255,0.4)',
+          bodyColor: '#fff',
+          padding: 10,
+          callbacks: { label: c => ' ' + (c.raw / 1000).toFixed(1) + 'k tokens' },
+        },
+      },
+      scales: {
+        x: { grid:{ display:false }, border:{ display:false }, ticks:{ color:'rgba(255,255,255,0.28)', font:{ size:10 } } },
+        y: { display: false, min: 0 },
+      },
+    },
+  });
+
+  setTimeout(() => { document.getElementById('progFill').style.width = '15.54%'; }, 300);
+}
+
+/* ══════════════════════════════════════
+   DONUT
+══════════════════════════════════════ */
+function drawDonut() {
+  const canvas = document.getElementById('donutCanvas');
+  const dpr    = Math.min(window.devicePixelRatio || 1, 3);
+  const size   = 210;
+  canvas.width  = size * dpr;
+  canvas.height = size * dpr;
+  canvas.style.width  = size + 'px';
+  canvas.style.height = size + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const cx  = size / 2;
+  const cy  = size / 2;
+  const r   = 82;
+  const lw  = 14;
+  const gap = 0.055; // radians between segments
+  const tot = PORTFOLIO.reduce((s, p) => s + p.alloc, 0);
+  let angle = -Math.PI / 2;
+
+  PORTFOLIO.forEach(seg => {
+    const sweep = (seg.alloc / tot) * 2 * Math.PI - gap;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, angle, angle + sweep);
+    ctx.strokeStyle = seg.color;
+    ctx.lineWidth   = lw;
+    ctx.lineCap     = 'round';
+    ctx.stroke();
+    angle += sweep + gap;
+  });
+}
+
+/* ══════════════════════════════════════
+   HOLDINGS
+══════════════════════════════════════ */
+function renderHoldings() {
+  document.getElementById('holdingsList').innerHTML = PORTFOLIO.map((h, i) => `
+    ${ i ? '<div class="divider" style="margin:0"></div>' : '' }
+    <div class="holding-row">
+      <div class="h-dot" style="background:${h.color}"></div>
+      <div class="h-info">
+        <div class="h-name">${h.name}</div>
+        <div class="h-sub">${h.alloc}%${ h.ticker ? ` &middot; <span id="px-${h.ticker}">—</span>` : '' }</div>
+      </div>
+      <div class="h-right">
+        <div class="h-val">£${h.value.toFixed(2)}</div>
+        <div class="h-gain ${h.gain >= 0 ? 'pos' : 'neg'}">${h.gain >= 0 ? '+' : ''}${h.gain}%</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ══════════════════════════════════════
+   LIVE PRICES
+══════════════════════════════════════ */
+async function fetchPrices() {
+  const tickers = PORTFOLIO.filter(p => p.ticker).map(p => p.ticker);
+  let anyLive   = false;
+
+  await Promise.allSettled(tickers.map(async ticker => {
+    try {
+      const url   = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
+      const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+      const res   = await fetch(proxy, { signal: AbortSignal.timeout(7000) });
+      const json  = await res.json();
+      const price = json?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      if (price) {
+        const el = document.getElementById(`px-${ticker}`);
+        if (el) el.textContent = `$${price.toFixed(2)}`;
+        anyLive = true;
+      }
+    } catch (_) { /* silent */ }
+  }));
+
+  const badge = document.getElementById('priceBadge');
+  if (anyLive) {
+    badge.className = 'live-badge live';
+    badge.innerHTML = '<div class="badge-dot"></div><span>Live</span>';
+  } else {
+    badge.className = 'live-badge cached';
+    badge.innerHTML = '<div class="badge-dot"></div><span>Cached</span>';
+  }
+}
+
+/* ══════════════════════════════════════
+   MEALS
+══════════════════════════════════════ */
+function renderMeals() {
+  const isWeekend = (DOW === 0 || DOW === 6);
+  if (isWeekend) {
+    document.getElementById('mealsList').innerHTML = `
+      <div style="padding:20px 0;text-align:center;color:var(--label);font-size:14px;line-height:1.5">
+        Free recipe day — cook what you fancy,<br>just stick to on-plan ingredients.
+      </div>`;
+    document.getElementById('swapLink').style.display = 'none';
+    return;
+  }
+  const i  = mealIdx();
+  const pb = i % 3;
+  const slots = [
+    { time:'Breakfast', meal: MEALS.breakfast[i]  },
+    { time:'Snack',     meal: MEALS.snack[i]       },
+    { time:'Lunch',     meal: MEALS.lunch[i]       },
+    { time:'Snack',     meal: MEALS.afternoon[i]   },
+    { time:'Dinner',    meal: MEALS.dinner[i]      },
+    { time:'Pre-bed',   meal: MEALS.preBed[pb]     },
+  ];
+  document.getElementById('mealsList').innerHTML = slots.map((s, idx) => `
+    ${ idx ? '<div class="divider" style="margin:0"></div>' : '' }
+    <div class="meal-row">
+      <div class="meal-time">${s.time}</div>
+      <div class="meal-text">${s.meal}</div>
+    </div>
+  `).join('');
+}
+
+document.getElementById('swapLink').addEventListener('click', () => {
+  mealSwap = (mealSwap + 1) % 5;
+  renderMeals();
+  document.getElementById('swapLink').textContent = 'Still not right? Swap again →';
+});
+
+/* ══════════════════════════════════════
+   WORKOUT
+══════════════════════════════════════ */
+function renderWorkout() {
+  document.getElementById('workoutTitle').textContent = WORKOUT_NAMES[DOW] || 'Rest Day';
+  const exs = WORKOUT_EXERCISES[DOW] || WORKOUT_EXERCISES[0];
+  document.getElementById('exerciseList').innerHTML = exs.map((e, i) => `
+    ${ i ? '<div class="divider" style="margin:0"></div>' : '' }
+    <div class="ex-row">
+      <div class="ex-name">${e.n}</div>
+      ${ e.r ? `<div class="ex-reps">${e.r}</div>` : '' }
+    </div>
+  `).join('');
+}
+
+/* ══════════════════════════════════════
+   HABITS
+══════════════════════════════════════ */
+function renderHabits() {
+  document.getElementById('habitsList').innerHTML = HABITS.map((h, i) => `
+    ${ i ? '<div class="divider" style="margin:0"></div>' : '' }
+    <div class="habit-row">
+      <div class="habit-check${ habitState[h.key] ? ' checked' : '' }" data-key="${h.key}">
+        <i class="ti ti-check"></i>
+      </div>
+      <div class="habit-label">${h.label}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('habitsList').addEventListener('click', e => {
+    const el = e.target.closest('.habit-check');
+    if (!el) return;
+    const key = el.dataset.key;
+    habitState[key] = !habitState[key];
+    el.classList.toggle('checked', habitState[key]);
+    el.classList.remove('pop');
+    void el.offsetWidth; // reflow to restart animation
+    el.classList.add('pop');
+    el.addEventListener('animationend', () => el.classList.remove('pop'), { once: true });
+    localStorage.setItem('habits_v2', JSON.stringify(habitState));
+  });
+}
+
+/* ══════════════════════════════════════
+   GOLF
+══════════════════════════════════════ */
+function initGolf() {
+  const display = document.getElementById('hcapDisplay');
+  const input   = document.getElementById('hcapInput');
+  const editBtn = document.getElementById('hcapEditBtn');
+  display.textContent = handicap.toFixed(1);
+
+  editBtn.addEventListener('click', () => {
+    input.value = handicap;
+    display.style.display = 'none';
+    editBtn.style.display = 'none';
+    input.style.display   = 'block';
+    input.focus();
+  });
+
+  function save() {
+    const v = parseFloat(input.value);
+    if (!isNaN(v) && v >= 0 && v <= 54) {
+      handicap = Math.round(v * 10) / 10;
+      localStorage.setItem('handicap', handicap);
+    }
+    display.textContent   = handicap.toFixed(1);
+    display.style.display = '';
+    editBtn.style.display = '';
+    input.style.display   = 'none';
+  }
+
+  input.addEventListener('blur', save);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') input.blur(); });
+}
+
+/* ══════════════════════════════════════
+   SKILLS
+══════════════════════════════════════ */
+function renderSkills() {
+  document.getElementById('skillsGrid').innerHTML = SKILLS_DATA.map(s => `
+    <div class="skill-card${ s.live ? '' : ' soon' }"
+      ${ s.live ? `onclick="openClaude('${s.trigger}')"` : '' }
+      role="${ s.live ? 'button' : 'article' }">
+      <div class="skill-icon" style="background:${s.bg}">
+        <i class="ti ${s.icon}" style="color:${s.color}"></i>
+      </div>
+      <div class="skill-name">${s.name}</div>
+      <div class="skill-status ${ s.live ? 'live' : 'soon' }">
+        <div class="status-dot"></div>
+        <span>${ s.live ? 'Live' : 'Coming soon' }</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ══════════════════════════════════════
+   TAB SWITCHING
+══════════════════════════════════════ */
+function switchTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelector(`.tab-item[data-tab="${id}"]`).classList.add('active');
+}
+document.querySelectorAll('.tab-item').forEach(el =>
+  el.addEventListener('click', () => switchTab(el.dataset.tab))
+);
+
+/* ══════════════════════════════════════
+   THEME
+══════════════════════════════════════ */
+function applyTheme(light) {
+  document.documentElement.classList.toggle('light', light);
+  document.querySelector('#themeBtn i').className = light ? 'ti ti-moon' : 'ti ti-sun';
+  localStorage.setItem('theme', light ? 'light' : 'dark');
+  // Update chart colors if rendered
+  if (usageChart) {
+    const tickColor = light ? 'rgba(0,0,0,0.28)' : 'rgba(255,255,255,0.28)';
+    usageChart.options.scales.x.ticks.color = tickColor;
+    usageChart.update('none');
+  }
+}
+document.getElementById('themeBtn').addEventListener('click', () =>
+  applyTheme(!document.documentElement.classList.contains('light'))
+);
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+function init() {
+  // Theme
+  if (localStorage.getItem('theme') === 'light') applyTheme(true);
+
+  // Reset today's habits (new day = fresh slate)
+  const lastDay = localStorage.getItem('habitsDay');
+  const todayKey = today.toISOString().slice(0, 10);
+  if (lastDay !== todayKey) {
+    habitState = {};
+    localStorage.setItem('habits_v2', '{}');
+    localStorage.setItem('habitsDay', todayKey);
+  }
+
+  initHome();
+  drawDonut();
+  renderHoldings();
+  renderMeals();
+  renderWorkout();
+  renderHabits();
+  renderSkills();
+  initGolf();
+  initUsageChart();
+
+  // Count-up on first load
+  setTimeout(() => {
+    document.querySelectorAll('[data-count]').forEach(countUp);
+  }, 150);
+
+  // Live prices (non-blocking)
+  fetchPrices();
+}
+
+init();
+</script>
+</body>
+</html>
