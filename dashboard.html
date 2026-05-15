@@ -8,35 +8,34 @@
   <title>Steven's OS</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     /* ─── DESIGN TOKENS ─── */
     :root {
-      --bg:          #0d0d0f;
-      --card:        #1a1a1f;
-      --border:      rgba(255,255,255,0.07);
-      --shadow:      0 2px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+      --bg:          #08080a;
+      --card:        #111114;
+      --border:      rgba(255,255,255,0.06);
+      --shadow:      none;
       --text:        #ffffff;
-      --label:       rgba(255,255,255,0.4);
-      --divider:     rgba(255,255,255,0.06);
+      --label:       rgba(255,255,255,0.35);
+      --divider:     rgba(255,255,255,0.05);
       --green:       #30d158;
       --red:         #ff453a;
       --blue:        #0a84ff;
       --gap:         16px;
-      --pad:         20px;
+      --pad:         22px;
       --r-card:      20px;
       --r-sm:        12px;
     }
     html.light {
-      --bg:      #f2f2f7;
+      --bg:      #f5f5f7;
       --card:    #ffffff;
-      --border:  rgba(0,0,0,0.07);
-      --shadow:  0 2px 16px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
-      --text:    #1c1c1e;
-      --label:   rgba(0,0,0,0.38);
-      --divider: rgba(0,0,0,0.06);
+      --border:  rgba(0,0,0,0.06);
+      --label:   rgba(0,0,0,0.35);
+      --divider: rgba(0,0,0,0.05);
+      --shadow:  none;
     }
 
     /* ─── RESET ─── */
@@ -47,7 +46,7 @@
 
     /* ─── BASE ─── */
     body {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100dvh;
@@ -63,7 +62,7 @@
       overflow: hidden;
     }
     @media (min-width: 431px) {
-      body { background: #080809; }
+      body { background: #050507; }
       .app { box-shadow: 0 0 80px rgba(0,0,0,0.7); background: var(--bg); }
     }
 
@@ -92,16 +91,16 @@
       width: 100%;
       max-width: 430px;
       height: calc(60px + env(safe-area-inset-bottom, 0px));
-      background: rgba(26,26,31,0.9);
+      background: rgba(17,17,20,0.94);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border-top: 0.5px solid var(--border);
+      border-top: 0.5px solid rgba(255,255,255,0.06);
       display: flex;
       align-items: flex-start;
       padding-top: 10px;
       z-index: 100;
     }
-    html.light .tab-bar { background: rgba(255,255,255,0.85); }
+    html.light .tab-bar { background: rgba(255,255,255,0.85); border-top-color: rgba(0,0,0,0.06); }
     .tab-item {
       flex: 1;
       display: flex;
@@ -113,47 +112,63 @@
       transition: opacity 100ms;
     }
     .tab-item:active { opacity: 0.6; }
-    .tab-item i { font-size: 22px; color: var(--label); transition: color 200ms; }
-    .tab-item span { font-size: 10px; letter-spacing: 0.3px; color: var(--label); transition: color 200ms; }
+    .tab-item i { font-size: 22px; color: rgba(255,255,255,0.28); transition: color 200ms; }
+    .tab-item span { font-size: 10px; letter-spacing: 0.3px; color: rgba(255,255,255,0.28); font-weight: 500; transition: color 200ms; }
+    html.light .tab-item i, html.light .tab-item span { color: rgba(0,0,0,0.32); }
     .tab-item.active i,
     .tab-item.active span { color: var(--green); }
 
     /* ─── CARD ─── */
     .card {
       background: var(--card);
-      border: 1px solid var(--border);
+      border: 0.5px solid var(--border);
       border-radius: var(--r-card);
       padding: var(--pad);
-      box-shadow: var(--shadow);
       margin-bottom: var(--gap);
     }
 
     /* ─── TYPE ─── */
     .page-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
     .section-title {
-      font-size: 16px; font-weight: 700; letter-spacing: -0.3px;
-      margin: 0 0 14px; padding-left: 10px;
-      position: relative; line-height: 1.2;
-      display: flex; align-items: center; gap: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin: 0 0 16px;
+      padding-left: 0;
+      position: relative;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
     }
-    .section-title::before {
-      content: ''; position: absolute; left: 0; top: 2px; bottom: 2px;
-      width: 3px; background: var(--green); border-radius: 2px;
+    .section-title.tight { margin-bottom: 12px; }
+    .section-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--label);
     }
+    .section-title .title-row { display: flex; align-items: center; gap: 8px; }
     .section-title .edit {
       margin-left: auto; padding: 4px 6px; color: var(--label);
       font-size: 14px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+      position: relative; z-index: 1;
     }
     .section-title .edit:active { opacity: 0.5; }
-    .section-title.tight { margin-bottom: 10px; }
     .label {
-      font-size: 10px;
+      font-size: 9px;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
       color: var(--label);
       font-weight: 600;
     }
-    .divider { height: 0.5px; background: var(--divider); margin: 10px 0; }
+    .divider { height: 0.5px; background: var(--divider); margin: 10px 0; border: none; }
+
+    /* Tabular numbers */
+    .stat-value, .h-val, .donut-total, .hcap-num, .trip-days, .donut-pct {
+      font-variant-numeric: tabular-nums;
+    }
 
     /* ─── ANIMATIONS ─── */
     @keyframes fadeUp {
@@ -168,14 +183,6 @@
       0%   { transform: scale(1); }
       45%  { transform: scale(1.18); }
       100% { transform: scale(1); }
-    }
-    @keyframes sheetIn {
-      from { transform: translateY(100%); }
-      to   { transform: translateY(0); }
-    }
-    @keyframes sheetOut {
-      from { transform: translateY(0); }
-      to   { transform: translateY(100%); }
     }
     @keyframes backdropIn {
       from { opacity: 0; }
@@ -194,7 +201,7 @@
     .home-date { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--label); margin-top: 6px; }
     .theme-btn {
       width: 36px; height: 36px; border-radius: 50%;
-      background: var(--card); border: 1px solid var(--border);
+      background: var(--card); border: 0.5px solid var(--border);
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; flex-shrink: 0; margin-top: 2px;
       -webkit-tap-highlight-color: transparent;
@@ -204,16 +211,15 @@
     /* Stat row */
     .stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: var(--gap); }
     .stat-card {
-      background: var(--card); border: 1px solid var(--border);
+      background: var(--card); border: 0.5px solid var(--border);
       border-radius: var(--r-card); padding: 14px 12px;
-      box-shadow: var(--shadow);
       position: relative;
       -webkit-tap-highlight-color: transparent;
     }
     .stat-card.tap { cursor: pointer; transition: transform 100ms; }
     .stat-card.tap:active { transform: scale(0.97); }
     .stat-card .label { display: block; margin-bottom: 8px; }
-    .stat-value { font-size: 14px; font-weight: 700; letter-spacing: -0.3px; line-height: 1.25; }
+    .stat-value { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; line-height: 1.2; }
     .stat-sub { font-size: 10px; margin-top: 3px; color: var(--label); }
     .stat-card .tt-edit-icon {
       position: absolute; top: 10px; right: 10px;
@@ -226,11 +232,11 @@
     .trip-route { font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
     .trip-sub { font-size: 11px; color: var(--label); margin-top: 2px; }
     .trip-count { text-align: right; }
-    .trip-days { font-size: 26px; font-weight: 800; letter-spacing: -1px; line-height: 1; color: var(--green); }
+    .trip-days { font-size: 26px; font-weight: 700; letter-spacing: -1px; line-height: 1; color: var(--green); }
     .trip-days-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--label); margin-top: 3px; }
     .trip-map { width: 100%; height: 150px; display: block; }
-    .trip-land { fill: rgba(255,255,255,0.07); stroke: rgba(255,255,255,0.12); stroke-width: 0.4; }
-    html.light .trip-land { fill: rgba(0,0,0,0.06); stroke: rgba(0,0,0,0.12); }
+    .trip-land { fill: rgba(255,255,255,0.06); stroke: rgba(255,255,255,0.1); stroke-width: 0.4; }
+    html.light .trip-land { fill: rgba(0,0,0,0.05); stroke: rgba(0,0,0,0.1); }
     .trip-water { fill: transparent; }
     .trip-path { fill: none; stroke: var(--red); stroke-width: 1.6; stroke-dasharray: 3 3; opacity: 0.85; }
     .trip-pin { fill: var(--red); }
@@ -242,18 +248,20 @@
     .glance-block { display: flex; flex-direction: column; gap: 4px; }
     .glance-icon-row { display: flex; align-items: center; gap: 8px; }
     .glance-icon-row i { font-size: 22px; color: var(--blue); }
-    .glance-temp { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    .glance-temp { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; font-variant-numeric: tabular-nums; }
     .glance-cond { font-size: 11px; color: var(--label); }
     .glance-quote { font-size: 12px; font-weight: 500; line-height: 1.4; color: var(--text); font-style: italic; }
     .glance-quote-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: var(--label); margin-bottom: 4px; }
 
     /* Quick actions */
     .action-btn {
-      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      background: var(--card); border: 0.5px solid var(--border); border-radius: 16px;
       padding: 15px var(--pad); display: flex; align-items: center; gap: 12px;
-      width: 100%; margin-bottom: 10px; box-shadow: var(--shadow);
-      -webkit-tap-highlight-color: transparent; transition: transform 100ms, opacity 100ms;
+      width: 100%; margin-bottom: 10px;
+      -webkit-tap-highlight-color: transparent; transition: transform 100ms, opacity 100ms, background 150ms;
     }
+    .action-btn:hover { background: rgba(255,255,255,0.03); }
+    html.light .action-btn:hover { background: rgba(0,0,0,0.02); }
     .action-btn:active { opacity: 0.7; transform: scale(0.985); }
     .action-icon {
       width: 36px; height: 36px; border-radius: 10px;
@@ -270,13 +278,13 @@
     /* Usage card */
     .usage-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
     .usage-stat { text-align: center; }
-    .usage-stat .num { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    .usage-stat .num { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; font-variant-numeric: tabular-nums; }
     .usage-stat .label { margin-top: 3px; display: block; }
     .chart-wrap { height: 72px; margin-bottom: 14px; }
     .prog-track { flex: 1; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; }
     html.light .prog-track { background: rgba(0,0,0,0.08); }
     .prog-fill { height: 100%; background: var(--green); border-radius: 2px; width: 0; transition: width 1s ease; }
-    .prog-label { font-size: 11px; color: var(--label); white-space: nowrap; }
+    .prog-label { font-size: 11px; color: var(--label); white-space: nowrap; font-variant-numeric: tabular-nums; }
 
     /* ─── PORTFOLIO ─── */
     .port-header { display: flex; justify-content: space-between; align-items: center; padding: 6px 0 20px; gap: 10px; }
@@ -291,7 +299,7 @@
     html.light .live-badge.cached { background: rgba(0,0,0,0.06); }
     .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
     .live-badge.live .badge-dot { animation: pulse 2.2s ease-in-out infinite; }
-    .icon-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--card); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .icon-btn { width: 32px; height: 32px; border-radius: 50%; background: var(--card); border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }
     .icon-btn i { font-size: 14px; color: var(--label); }
 
     .donut-wrap { display: flex; justify-content: center; align-items: center; position: relative; height: 210px; margin-bottom: 6px; }
@@ -303,12 +311,14 @@
     .h-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
     .h-info { flex: 1; min-width: 0; }
     .h-name { font-size: 14px; font-weight: 600; letter-spacing: -0.2px; }
-    .h-sub { font-size: 11px; color: var(--label); margin-top: 1px; }
+    .h-sub { font-size: 11px; color: var(--label); margin-top: 1px; font-variant-numeric: tabular-nums; }
     .h-right { text-align: right; flex-shrink: 0; }
     .h-val { font-size: 14px; font-weight: 700; letter-spacing: -0.2px; }
-    .h-gain { font-size: 11px; font-weight: 600; margin-top: 1px; }
+    .h-gain { font-size: 11px; font-weight: 600; margin-top: 1px; font-variant-numeric: tabular-nums; }
     .pos { color: var(--green); }
     .neg { color: var(--red); }
+    .holding-divider { height: 0.5px; background: rgba(255,255,255,0.04); margin: 0; border: none; }
+    html.light .holding-divider { background: rgba(0,0,0,0.04); }
 
     .research-btn {
       width: 100%; background: var(--blue); color: #fff;
@@ -325,30 +335,49 @@
     .meal-row { display: flex; align-items: flex-start; gap: 12px; padding: 9px 0; }
     .meal-time { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--label); font-weight: 600; width: 70px; flex-shrink: 0; padding-top: 2px; }
     .meal-text { flex: 1; font-size: 13px; font-weight: 500; letter-spacing: -0.1px; line-height: 1.35; }
-    .swap-link { display: block; margin-top: 12px; font-size: 13px; color: var(--blue); font-weight: 500; cursor: pointer; text-align: right; -webkit-tap-highlight-color: transparent; }
-    .swap-link:active { opacity: 0.5; }
+
+    .swap-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.06);
+      border: 0.5px solid rgba(255,255,255,0.1);
+      border-radius: 99px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      margin-top: 12px;
+      float: right;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 150ms;
+    }
+    .swap-btn:active { background: rgba(255,255,255,0.1); }
+    html.light .swap-btn { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
+    html.light .swap-btn:active { background: rgba(0,0,0,0.08); }
 
     .ex-row { display: flex; align-items: center; padding: 9px 0; }
     .ex-name { flex: 1; font-size: 14px; font-weight: 500; letter-spacing: -0.1px; }
-    .ex-reps { font-size: 13px; font-weight: 700; color: var(--label); }
+    .ex-reps { font-size: 13px; font-weight: 700; color: var(--label); font-variant-numeric: tabular-nums; }
 
     .habit-row { display: flex; align-items: center; gap: 14px; padding: 11px 0; }
     .habit-check {
       width: 26px; height: 26px; border-radius: 50%;
-      border: 2px solid rgba(255,255,255,0.14); background: transparent;
+      border: 0.5px solid rgba(255,255,255,0.18); background: transparent;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; flex-shrink: 0;
       transition: background 180ms, border-color 180ms;
       -webkit-tap-highlight-color: transparent;
     }
-    html.light .habit-check { border-color: rgba(0,0,0,0.16); }
+    html.light .habit-check { border-color: rgba(0,0,0,0.18); }
     .habit-check.checked { background: var(--green); border-color: var(--green); }
     .habit-check i { font-size: 13px; color: #fff; opacity: 0; transition: opacity 150ms; }
     .habit-check.checked i { opacity: 1; }
     .habit-check.pop { animation: habitPop 220ms ease; }
     .habit-label { flex: 1; font-size: 14px; font-weight: 500; letter-spacing: -0.1px; }
 
-    .golf-card { background: #0f1f0f; border-color: rgba(48,209,88,0.15); }
+    .golf-card { background: #0d1a0e; border-color: rgba(48,209,88,0.15); }
     html.light .golf-card { background: #eaf7ed; border-color: rgba(48,209,88,0.25); }
     .hcap-row { display: flex; align-items: flex-end; gap: 10px; margin-top: 8px; }
     .hcap-num { font-size: 52px; font-weight: 700; letter-spacing: -2px; line-height: 1; }
@@ -359,6 +388,7 @@
       background: transparent; border: none; border-bottom: 2px solid var(--green);
       color: var(--text); width: 130px; outline: none;
       font-family: inherit; line-height: 1; display: none;
+      font-variant-numeric: tabular-nums;
     }
     .golf-footer { display: flex; justify-content: space-between; margin-top: 14px; padding-top: 14px; border-top: 0.5px solid rgba(48,209,88,0.1); }
 
@@ -367,8 +397,8 @@
     .skills-badge { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; background: rgba(48,209,88,0.12); color: var(--green); padding: 3px 9px; border-radius: 20px; }
     .skills-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: var(--gap); }
     .skill-card {
-      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
-      padding: 16px; box-shadow: var(--shadow); cursor: pointer;
+      background: var(--card); border: 0.5px solid var(--border); border-radius: 16px;
+      padding: 16px; cursor: pointer;
       transition: transform 100ms, opacity 100ms;
       -webkit-tap-highlight-color: transparent;
     }
@@ -397,9 +427,9 @@
       position: fixed; bottom: 0; left: 50%; transform: translateX(-50%) translateY(100%);
       width: 100%; max-width: 430px;
       background: var(--card); border-top-left-radius: 22px; border-top-right-radius: 22px;
+      border: 0.5px solid var(--border);
       z-index: 201; padding: 14px var(--pad) calc(env(safe-area-inset-bottom, 0px) + 24px);
       max-height: 85dvh; overflow-y: auto;
-      box-shadow: 0 -8px 40px rgba(0,0,0,0.6);
       transition: transform 280ms cubic-bezier(0.32, 0.72, 0, 1);
     }
     .sheet.show { transform: translateX(-50%) translateY(0); }
@@ -414,7 +444,7 @@
     }
     .sheet-row:first-of-type { border-top: none; }
     .sheet-row .label-text { flex: 1; font-size: 14px; font-weight: 500; }
-    .sheet-row .sub { font-size: 11px; color: var(--label); margin-top: 2px; }
+    .sheet-row .sub { font-size: 11px; color: var(--label); margin-top: 2px; font-variant-numeric: tabular-nums; }
     .sheet-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .sheet-icon i { font-size: 16px; }
 
@@ -435,7 +465,7 @@
 
     .sheet-input {
       width: 100%; padding: 12px 14px; background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border); border-radius: 12px;
+      border: 0.5px solid var(--border); border-radius: 12px;
       font-size: 14px; outline: none;
       font-family: inherit;
     }
@@ -450,7 +480,7 @@
     }
     .sheet-btn:active { transform: scale(0.97); opacity: 0.85; }
     .sheet-btn.full { width: 100%; margin-top: 6px; }
-    .sheet-btn.ghost { background: transparent; color: var(--blue); border: 1px solid var(--blue); }
+    .sheet-btn.ghost { background: transparent; color: var(--blue); border: 0.5px solid var(--blue); }
     .del-btn {
       width: 28px; height: 28px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
@@ -490,17 +520,17 @@
     <div class="stat-row">
       <div class="stat-card fade-in" style="animation-delay:0ms">
         <span class="label">Portfolio</span>
-        <div class="stat-value" data-count="782.42" data-prefix="£" data-dec="2">£0</div>
-        <div class="stat-sub pos">+11.80%</div>
+        <div class="stat-value" data-count="1593.12" data-prefix="£" data-dec="2">£0</div>
+        <div class="stat-sub pos">+32.76%</div>
       </div>
       <div class="stat-card fade-in" style="animation-delay:120ms">
         <span class="label">Workout</span>
-        <div class="stat-value" id="todayWorkoutStat" style="font-size:12px;line-height:1.3"></div>
+        <div class="stat-value" id="todayWorkoutStat" style="font-size:13px;line-height:1.3"></div>
       </div>
       <div class="stat-card tap fade-in" id="teeTimeCard" style="animation-delay:240ms">
         <i class="ti ti-pencil tt-edit-icon"></i>
         <span class="label">Tee Time</span>
-        <div class="stat-value" id="teeTimeValue" style="font-size:12px;color:var(--label)">Tap to set</div>
+        <div class="stat-value" id="teeTimeValue" style="font-size:13px;color:var(--label)">Tap to set</div>
         <div class="stat-sub" id="teeTimeSub"></div>
       </div>
     </div>
@@ -518,33 +548,21 @@
         </div>
       </div>
       <svg class="trip-map" viewBox="0 0 380 150" preserveAspectRatio="xMidYMid meet" id="tripMap">
-        <!-- Simplified Europe / Mediterranean landmasses -->
-        <!-- UK/Ireland -->
         <path class="trip-land" d="M 70 38 L 78 32 L 86 36 L 92 44 L 90 56 L 84 64 L 76 62 L 72 54 L 68 46 Z M 56 50 L 64 48 L 66 56 L 60 60 L 54 56 Z" />
-        <!-- Iberia (Spain/Portugal) -->
         <path class="trip-land" d="M 60 96 L 75 90 L 95 92 L 115 94 L 130 100 L 132 110 L 124 120 L 108 124 L 88 122 L 70 116 L 58 108 Z" />
-        <!-- France -->
         <path class="trip-land" d="M 100 70 L 120 64 L 140 68 L 150 78 L 148 90 L 134 92 L 118 88 L 104 82 Z" />
-        <!-- Central Europe / Italy -->
         <path class="trip-land" d="M 150 70 L 180 66 L 210 70 L 220 80 L 215 92 L 200 94 L 180 90 L 160 86 Z M 175 96 L 184 94 L 192 110 L 188 124 L 180 122 L 176 112 Z" />
-        <!-- Balkans / Greece -->
         <path class="trip-land" d="M 220 84 L 250 80 L 270 86 L 268 100 L 254 110 L 238 108 L 224 100 Z" />
-        <!-- North Africa coast -->
         <path class="trip-land" d="M 50 130 L 100 132 L 160 134 L 220 134 L 280 134 L 340 134 L 360 138 L 360 150 L 0 150 L 0 134 L 30 132 Z" />
-        <!-- Scandinavia hint -->
         <path class="trip-land" d="M 150 18 L 175 14 L 195 22 L 200 38 L 188 48 L 170 46 L 158 38 L 150 28 Z" />
 
-        <!-- Flight path: London (88, 50) → Malaga (95, 118) — curved -->
         <path id="flightPath" class="trip-path" d="M 88 50 Q 60 90 95 118" />
 
-        <!-- Origin pin -->
         <circle class="trip-pin-glow" cx="88" cy="50" r="5"/>
         <circle class="trip-pin" cx="88" cy="50" r="2.5"/>
-        <!-- Destination pin -->
         <circle class="trip-pin-glow" cx="95" cy="118" r="5"/>
         <circle class="trip-pin" cx="95" cy="118" r="2.5"/>
 
-        <!-- Animated plane -->
         <text class="trip-plane" text-anchor="middle" dominant-baseline="middle" font-family="Tabler Icons">
           <animateMotion dur="6s" repeatCount="indefinite" rotate="auto">
             <mpath href="#flightPath"/>
@@ -552,21 +570,26 @@
           ✈
         </text>
 
-        <!-- Labels -->
-        <text x="88" y="38" font-size="8" fill="rgba(255,255,255,0.55)" text-anchor="middle" font-family="Plus Jakarta Sans">London</text>
-        <text x="95" y="132" font-size="8" fill="rgba(255,255,255,0.55)" text-anchor="middle" font-family="Plus Jakarta Sans">Malaga</text>
+        <text x="88" y="38" font-size="8" fill="rgba(255,255,255,0.55)" text-anchor="middle" font-family="Inter">London</text>
+        <text x="95" y="132" font-size="8" fill="rgba(255,255,255,0.55)" text-anchor="middle" font-family="Inter">Malaga</text>
       </svg>
     </div>
 
     <!-- Quick Actions -->
     <div class="section-title fade-in tight" style="animation-delay:200ms">
-      Quick Actions
-      <span class="edit" id="editActionsBtn"><i class="ti ti-pencil"></i></span>
+      <span class="section-label">HOME</span>
+      <div class="title-row">
+        Quick Actions
+        <span class="edit" id="editActionsBtn"><i class="ti ti-pencil"></i></span>
+      </div>
     </div>
     <div id="quickActions"></div>
 
     <!-- Today at a glance -->
-    <div class="section-title fade-in tight" style="animation-delay:280ms">Today at a Glance</div>
+    <div class="section-title fade-in tight" style="animation-delay:280ms">
+      <span class="section-label">HOME</span>
+      <div class="title-row">Today at a Glance</div>
+    </div>
     <div class="card fade-in" style="animation-delay:300ms">
       <div class="glance-row">
         <div class="glance-block">
@@ -585,8 +608,11 @@
 
     <!-- Claude Usage -->
     <div class="card fade-in" style="animation-delay:350ms">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-        <div class="section-title" style="margin-bottom:0">Claude Usage</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div class="section-title" style="margin-bottom:0">
+          <span class="section-label">HOME</span>
+          <div class="title-row">Claude Usage</div>
+        </div>
         <div class="label">This week</div>
       </div>
       <div class="usage-stats">
@@ -652,29 +678,42 @@
 
     <!-- Meals -->
     <div class="card">
-      <div class="section-title">Today's Meals</div>
+      <div class="section-title">
+        <span class="section-label">HEALTH</span>
+        <div class="title-row">Today's Meals</div>
+      </div>
       <div id="mealsList"></div>
-      <span class="swap-link" id="swapLink">Not feeling these? Swap &rarr;</span>
+      <button class="swap-btn" id="swapLink">Swap →</button>
+      <div style="clear:both"></div>
     </div>
 
     <!-- Workout -->
     <div class="card">
-      <div class="section-title" id="workoutTitle">Today's Workout</div>
+      <div class="section-title">
+        <span class="section-label">HEALTH</span>
+        <div class="title-row" id="workoutTitle">Today's Workout</div>
+      </div>
       <div id="exerciseList"></div>
     </div>
 
     <!-- Habits -->
     <div class="card">
       <div class="section-title">
-        Today's Habits
-        <span class="edit" id="editHabitsBtn"><i class="ti ti-pencil"></i></span>
+        <span class="section-label">HEALTH</span>
+        <div class="title-row">
+          Today's Habits
+          <span class="edit" id="editHabitsBtn"><i class="ti ti-pencil"></i></span>
+        </div>
       </div>
       <div id="habitsList"></div>
     </div>
 
     <!-- Golf -->
     <div class="card golf-card">
-      <div class="label">Handicap</div>
+      <div class="section-title" style="margin-bottom:0">
+        <span class="section-label">GOLF</span>
+        <div class="title-row">Handicap</div>
+      </div>
       <div class="hcap-row">
         <div class="hcap-num" id="hcapDisplay">15.1</div>
         <input type="number" id="hcapInput" class="hcap-input" step="0.1" min="0" max="54">
@@ -685,7 +724,7 @@
       <div class="golf-footer">
         <div>
           <div class="label">Best Round</div>
-          <div style="font-size:16px;font-weight:700;margin-top:4px">83</div>
+          <div style="font-size:16px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums">83</div>
         </div>
         <div style="text-align:right">
           <div class="label">Course</div>
@@ -726,7 +765,6 @@
 <!-- ═══════════ MODALS ═══════════ -->
 <div class="backdrop" id="backdrop"></div>
 
-<!-- Tee time sheet -->
 <div class="sheet" id="sheetTeeTime">
   <div class="sheet-grab"></div>
   <div class="sheet-close" data-close><i class="ti ti-x"></i></div>
@@ -738,7 +776,6 @@
   <button class="sheet-btn full ghost" id="teeClearBtn" style="margin-top:8px">Clear</button>
 </div>
 
-<!-- Quick Actions sheet -->
 <div class="sheet" id="sheetActions">
   <div class="sheet-grab"></div>
   <div class="sheet-close" data-close><i class="ti ti-x"></i></div>
@@ -747,7 +784,6 @@
   <div id="actionsToggleList"></div>
 </div>
 
-<!-- Portfolio sheet -->
 <div class="sheet" id="sheetPortfolio">
   <div class="sheet-grab"></div>
   <div class="sheet-close" data-close><i class="ti ti-x"></i></div>
@@ -763,7 +799,6 @@
   <button class="sheet-btn full" id="addHoldingBtn">Add Holding</button>
 </div>
 
-<!-- Habits sheet -->
 <div class="sheet" id="sheetHabits">
   <div class="sheet-grab"></div>
   <div class="sheet-close" data-close><i class="ti ti-x"></i></div>
@@ -778,19 +813,23 @@
 
 <script>
 /* ══════════════════════════════════════
-   DATA — defaults (overridden by storage)
+   DATA
+   Cost basis: £700 invested in long-term portfolio
+   Current:    £795.11  →  +£95.11 long-term gain
+   EUR.AX:     £500 invested → £798.01 current = +£298.01
+   Total invested £1,200 · current £1,593.12 · +£393.12 (+32.76%)
 ══════════════════════════════════════ */
 const DEFAULT_PORTFOLIO = [
-  { name:'Vanguard S&P 500',  alloc:47.75, value:373.64, gain: 6.75,  color:'#0a84ff' },
-  { name:'Vanguard All-World', alloc:33.86, value:264.91, gain: 8.13,  color:'#bf5af2' },
-  { name:'AMD',               alloc:11.19, value:87.57,  gain:78.97,  color:'#64d2ff', ticker:'AMD' },
-  { name:'Nvidia',            alloc: 5.12, value:40.06,  gain:14.62,  color:'#ff9f0a', ticker:'NVDA' },
-  { name:'Palantir',          alloc: 2.08, value:16.28,  gain:-22.37, color:'#ff453a', ticker:'PLTR' },
+  { name:'Vanguard S&P 500',   alloc:47.75, cost:350.00, value:380.00, gain:  8.57, color:'#0a84ff' },
+  { name:'Vanguard All-World', alloc:33.86, cost:245.00, value:269.20, gain:  9.88, color:'#bf5af2' },
+  { name:'AMD',                alloc:11.19, cost: 49.00, value: 89.00, gain: 81.63, color:'#64d2ff', ticker:'AMD' },
+  { name:'Nvidia',             alloc: 5.12, cost: 35.00, value: 40.70, gain: 16.29, color:'#ff9f0a', ticker:'NVDA' },
+  { name:'Palantir',           alloc: 2.08, cost: 21.00, value: 16.21, gain:-22.81, color:'#ff453a', ticker:'PLTR' },
 ];
 
-// EUR.AX special — 1923 shares (£500 ÷ £0.26) tracked in AUD on ASX
 const EUR_AX = {
-  name: 'EUR.AX', shares: 1923, invested: 500, color: '#ffd60a', ticker: 'EUR.AX',
+  name: 'EUR.AX', shares: 1923, invested: 500, currentDefault: 798.01,
+  color: '#ffd60a', ticker: 'EUR.AX',
 };
 
 const DEFAULT_HABITS = [
@@ -850,23 +889,21 @@ const QUOTES = [
    STATE
 ══════════════════════════════════════ */
 const today = new Date();
-const DOW   = today.getDay(); // 0=Sun
+const DOW   = today.getDay();
 let mealSwap = 0;
 
-// Load persisted state
-let portfolio = JSON.parse(localStorage.getItem('portfolio_v2') || 'null') || JSON.parse(JSON.stringify(DEFAULT_PORTFOLIO));
+let portfolio = JSON.parse(localStorage.getItem('portfolio_v3') || 'null') || JSON.parse(JSON.stringify(DEFAULT_PORTFOLIO));
 let habits    = JSON.parse(localStorage.getItem('habitsList_v2') || 'null') || JSON.parse(JSON.stringify(DEFAULT_HABITS));
 let habitState = JSON.parse(localStorage.getItem('habits_v2') || '{}');
 let handicap   = parseFloat(localStorage.getItem('handicap') || '15.1');
-let teeTime    = JSON.parse(localStorage.getItem('teeTime') || 'null'); // {iso, course}
+let teeTime    = JSON.parse(localStorage.getItem('teeTime') || 'null');
 let activeActions = JSON.parse(localStorage.getItem('activeActions') || 'null') || ['morning','daily','capture'];
 let usageChart = null;
 
-// Live FX rates
-let fxGBPUSD = null; // GBP per USD
-let fxAUDGBP = null; // GBP per AUD
-let livePrices = {}; // { ticker: USD or AUD price }
-let eurAxValueGBP = EUR_AX.invested; // start with invested
+let fxGBPUSD = null;
+let fxAUDGBP = null;
+let livePrices = {};
+let eurAxValueGBP = EUR_AX.currentDefault;
 
 /* ══════════════════════════════════════
    HELPERS
@@ -884,7 +921,6 @@ function fmtDate(d) {
 }
 function openClaude(trigger) {
   if (navigator.clipboard) navigator.clipboard.writeText(trigger).catch(()=>{});
-  // Try deep link to Claude app, fall back to web
   const start = Date.now();
   const fallback = setTimeout(() => {
     if (Date.now() - start < 2500) window.open('https://claude.ai', '_blank');
@@ -978,7 +1014,7 @@ function renderQuickActions() {
 }
 
 /* ══════════════════════════════════════
-   WEATHER (Oxford via open-meteo, 1hr cache)
+   WEATHER
 ══════════════════════════════════════ */
 const WEATHER_ICONS = {
   0:['ti-sun','Clear'], 1:['ti-sun','Mostly clear'], 2:['ti-cloud-sun','Partly cloudy'], 3:['ti-cloud','Overcast'],
@@ -1055,7 +1091,7 @@ function initUsageChart() {
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: '#1a1a1f', borderColor: 'rgba(255,255,255,0.07)', borderWidth: 1,
+          backgroundColor: '#111114', borderColor: 'rgba(255,255,255,0.06)', borderWidth: 1,
           titleColor: 'rgba(255,255,255,0.4)', bodyColor: '#fff', padding: 10,
           callbacks: { label: c => ' ' + (c.raw / 1000).toFixed(1) + 'k tokens' },
         },
@@ -1086,11 +1122,13 @@ function drawDonut() {
   ctx.scale(dpr, dpr);
 
   const cx = size / 2, cy = size / 2, r = 82, lw = 14, gap = 0.055;
-  const segs = portfolio.concat([{ alloc: (eurAxValueGBP / portfolioTotalGBP()) * 100, color: EUR_AX.color }]);
-  const tot = segs.reduce((s, p) => s + p.alloc, 0);
+  const tot = portfolioTotalGBP();
+  const segs = portfolio.map(p => ({ alloc: (p.value / tot) * 100, color: p.color }))
+    .concat([{ alloc: (eurAxValueGBP / tot) * 100, color: EUR_AX.color }]);
+  const sumA = segs.reduce((s, p) => s + p.alloc, 0);
   let angle = -Math.PI / 2;
   segs.forEach(seg => {
-    const sweep = (seg.alloc / tot) * 2 * Math.PI - gap;
+    const sweep = (seg.alloc / sumA) * 2 * Math.PI - gap;
     if (sweep <= 0) return;
     ctx.beginPath();
     ctx.arc(cx, cy, r, angle, angle + sweep);
@@ -1106,10 +1144,14 @@ function portfolioTotalGBP() {
   return portfolio.reduce((s, p) => s + p.value, 0) + eurAxValueGBP;
 }
 
+function totalInvested() {
+  return portfolio.reduce((s, p) => s + (p.cost != null ? p.cost : p.value / (1 + p.gain / 100)), 0) + EUR_AX.invested;
+}
+
 function updateDonutCenter() {
   const tot = portfolioTotalGBP();
-  const investedBase = portfolio.reduce((s, p) => s + p.value / (1 + p.gain / 100), 0) + EUR_AX.invested;
-  const gainPct = ((tot - investedBase) / investedBase) * 100;
+  const inv = totalInvested();
+  const gainPct = ((tot - inv) / inv) * 100;
   document.getElementById('donutTotal').textContent = '£' + tot.toFixed(2);
   const pctEl = document.getElementById('donutPct');
   pctEl.textContent = (gainPct >= 0 ? '+' : '') + gainPct.toFixed(2) + '%';
@@ -1122,7 +1164,7 @@ function updateDonutCenter() {
 function renderHoldings() {
   const tot = portfolioTotalGBP();
   const rows = portfolio.map((h, i) => `
-    ${ i ? '<div class="divider" style="margin:0"></div>' : '' }
+    ${ i ? '<div class="holding-divider"></div>' : '' }
     <div class="holding-row">
       <div class="h-dot" style="background:${h.color}"></div>
       <div class="h-info">
@@ -1136,10 +1178,9 @@ function renderHoldings() {
     </div>
   `).join('');
 
-  // EUR.AX live row
   const eurGain = ((eurAxValueGBP - EUR_AX.invested) / EUR_AX.invested) * 100;
   const eurRow = `
-    <div class="divider" style="margin:0"></div>
+    <div class="holding-divider"></div>
     <div class="holding-row">
       <div class="h-dot" style="background:${EUR_AX.color}"></div>
       <div class="h-info">
@@ -1170,14 +1211,12 @@ async function fetchOne(symbol) {
 }
 
 async function fetchPrices() {
-  // Fetch FX first
   const [usd, aud] = await Promise.all([fetchOne('GBPUSD=X'), fetchOne('AUDGBP=X')]);
-  if (usd) fxGBPUSD = usd; // 1 GBP = X USD
-  if (aud) fxAUDGBP = aud; // 1 AUD = X GBP
+  if (usd) fxGBPUSD = usd;
+  if (aud) fxAUDGBP = aud;
 
   let anyLive = false;
 
-  // US tickers from portfolio
   const usTickers = portfolio.filter(p => p.ticker).map(p => p.ticker);
   await Promise.allSettled(usTickers.map(async t => {
     const px = await fetchOne(t);
@@ -1196,7 +1235,6 @@ async function fetchPrices() {
     }
   }));
 
-  // EUR.AX in AUD
   const eurAud = await fetchOne('EUR.AX');
   if (eurAud && fxAUDGBP) {
     eurAxValueGBP = EUR_AX.shares * eurAud * fxAUDGBP;
@@ -1252,7 +1290,7 @@ function renderMeals() {
 document.getElementById('swapLink').addEventListener('click', () => {
   mealSwap = (mealSwap + 1) % 5;
   renderMeals();
-  document.getElementById('swapLink').textContent = 'Still not right? Swap again →';
+  document.getElementById('swapLink').textContent = 'Swap again →';
 });
 
 /* ══════════════════════════════════════
@@ -1370,6 +1408,7 @@ document.querySelectorAll('.tab-item').forEach(el =>
 ══════════════════════════════════════ */
 function applyTheme(light) {
   document.documentElement.classList.toggle('light', light);
+  // ti-sun in dark mode (tap to go light), ti-moon in light mode (tap to go dark)
   document.querySelector('#themeBtn i').className = light ? 'ti ti-moon' : 'ti ti-sun';
   localStorage.setItem('theme', light ? 'light' : 'dark');
   if (usageChart) {
@@ -1403,7 +1442,6 @@ function closeSheet() {
 backdrop.addEventListener('click', closeSheet);
 document.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeSheet));
 
-/* ── Tee time sheet ── */
 document.getElementById('teeTimeCard').addEventListener('click', () => {
   const inp = document.getElementById('teeTimeInput');
   const crs = document.getElementById('teeCourseInput');
@@ -1432,7 +1470,6 @@ document.getElementById('teeClearBtn').addEventListener('click', () => {
   closeSheet();
 });
 
-/* ── Quick Actions sheet ── */
 document.getElementById('editActionsBtn').addEventListener('click', () => {
   document.getElementById('actionsToggleList').innerHTML = SKILLS_DATA.map(s => `
     <div class="sheet-row">
@@ -1458,7 +1495,6 @@ document.getElementById('editActionsBtn').addEventListener('click', () => {
   showSheet('sheetActions');
 });
 
-/* ── Portfolio sheet ── */
 function renderPortfolioEditList() {
   document.getElementById('portfolioEditList').innerHTML = portfolio.map((h, i) => `
     <div class="sheet-row">
@@ -1470,7 +1506,7 @@ function renderPortfolioEditList() {
   document.querySelectorAll('#portfolioEditList .del-btn').forEach(b => {
     b.addEventListener('click', () => {
       portfolio.splice(parseInt(b.dataset.i, 10), 1);
-      save('portfolio_v2', portfolio);
+      save('portfolio_v3', portfolio);
       renderPortfolioEditList();
       renderHoldings();
       drawDonut();
@@ -1490,10 +1526,12 @@ document.getElementById('addHoldingBtn').addEventListener('click', () => {
   const palette = ['#0a84ff','#bf5af2','#64d2ff','#ff9f0a','#ff453a','#30d158','#ffd60a','#ff375f'];
   const used = portfolio.map(p => p.color);
   const color = palette.find(c => !used.includes(c)) || palette[portfolio.length % palette.length];
-  const h = { name, value, gain: isNaN(gain) ? 0 : gain, alloc: 0, color };
+  const g = isNaN(gain) ? 0 : gain;
+  const cost = value / (1 + g / 100);
+  const h = { name, value, gain: g, cost, alloc: 0, color };
   if (ticker) h.ticker = ticker;
   portfolio.push(h);
-  save('portfolio_v2', portfolio);
+  save('portfolio_v3', portfolio);
   document.getElementById('newHoldingName').value = '';
   document.getElementById('newHoldingTicker').value = '';
   document.getElementById('newHoldingValue').value = '';
@@ -1504,7 +1542,6 @@ document.getElementById('addHoldingBtn').addEventListener('click', () => {
   fetchPrices();
 });
 
-/* ── Habits sheet ── */
 function renderHabitsEditList() {
   document.getElementById('habitsEditList').innerHTML = habits.map((h, i) => `
     <div class="sheet-row">
