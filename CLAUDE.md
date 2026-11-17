@@ -53,6 +53,7 @@ Skills for turning the CRM dashboard into a sellable product for small businesse
 - write the pitch
 - scope the build
 - price the job
+- design the page (design-taste-frontend — third-party "taste" skill from Leonxlnx/taste-skill, MIT; makes landing pages and sites look professional, not templated)
 
 ### Health & Body
 Skills for staying on plan with diet, training, and habits.
